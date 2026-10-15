@@ -86,12 +86,73 @@ export interface SubjectGrade {
   kktpGenap?: number;
 }
 
+export type ActivityCategory =
+  | 'Teknologi'
+  | 'Bela Diri'
+  | 'Seni & Desain'
+  | 'Kuliner & Keterampilan'
+  | 'Olahraga'
+  | 'Bahasa & Keagamaan'
+  | 'Petualangan & Alam Bebas';
+
+export interface ExtracurricularMaster {
+  id: string;
+  nama: string; // e.g. "Robotic", "Jiujitsu (Grappling)", "Drawing", "Cooking", "Futsal", "Pencak Silat"
+  kategori: ActivityCategory;
+  deskripsi: string;
+  pembina: string;
+  jadwal: string;
+  lokasi?: string;
+  tingkatKelas: number[]; // e.g. [1, 2, 3, 4, 5, 6]
+  kuotaMaksimal?: number;
+  status: 'aktif' | 'nonaktif';
+  isWajibPemerintah?: boolean; // e.g. Pencak Silat requested by government
+  iconName?: string;
+}
+
+export type SkillMasteryLevel =
+  | 'Belum Diuji'
+  | 'Tingkat Pemula'
+  | 'Tingkat Berkembang'
+  | 'Tingkat Terampil'
+  | 'Lulus Uji Mandiri / Mahir';
+
+export interface MustHaveSkillMaster {
+  id: string;
+  kode: 'swimming' | 'horse_riding' | 'camping_skill' | 'rope_rappelling' | string;
+  nama: string; // "Berenang (Swimming)", "Berkuda (Horse Riding)", "Pramuka & Kemampuan Berkemah (Camping Skill)", "Rappelling & Tali Temali (Rope Rappelling)"
+  kategori: 'Outdoor Adventure' | 'Sunnah Sport' | 'Survival & Kepanduan';
+  deskripsi: string;
+  wajibSemuaSiswa: boolean; // Must have skill in this school
+  kompetensiDasar: string[];
+  tingkatUji: string[];
+  instruktur: string;
+  jadwalLatihan: string;
+  lokasi: string;
+  iconName: string;
+  status: 'aktif' | 'nonaktif';
+}
+
+export interface StudentMustHaveSkillRecord {
+  skillId: string;
+  kode: string;
+  nama: string;
+  levelCapaian: SkillMasteryLevel;
+  badgeEarned: boolean;
+  tanggalUjian?: string;
+  penguji?: string;
+  catatan?: string;
+  pencapaianSpesifik?: string[];
+}
+
 export interface Extracurricular {
-  nama: string; // e.g. Hizbul Wathan/Pramuka, Tapak Suci, Tahfidz
+  nama: string; // e.g. Robotic, Jiujitsu (Grappling), Drawing, Cooking, Futsal, Silat
   nilaiGanjil?: string; // Sangat Baik, Baik, etc.
   keteranganGanjil?: string;
   nilaiGenap?: string;
   keteranganGenap?: string;
+  pembina?: string;
+  jadwal?: string;
 }
 
 export interface AttendanceRecord {
@@ -231,6 +292,7 @@ export interface StudentMasterRecord {
   historicalScores: HistoricalSemesterScore[];
   cocurriculars: CocurricularProject[];
   contributions: StudentContribution[];
+  mustHaveSkills?: StudentMustHaveSkillRecord[];
 }
 
 export interface MonthlyClassRekap {

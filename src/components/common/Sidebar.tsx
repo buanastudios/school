@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   ArrowLeftRight,
   BookOpen,
+  Trophy,
   Printer,
   Settings,
   Users,
@@ -46,6 +47,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Buku Induk Register',
       icon: BookOpen,
       badge: 'Kurikulum Merdeka',
+    },
+    {
+      id: 'kegiatan' as NavTab,
+      label: 'Ekstra & Kokurikuler',
+      icon: Trophy,
+      badge: 'Bakat & Keahlian',
     },
     {
       id: 'cetak-buku' as NavTab,

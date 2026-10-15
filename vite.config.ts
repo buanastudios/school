@@ -33,6 +33,7 @@ export default defineConfig({
         mutasi: resolve(import.meta.dirname, 'mutasi.html'),
         bukuInduk: resolve(import.meta.dirname, 'buku-induk.html'),
         cetakBuku: resolve(import.meta.dirname, 'cetak-buku.html'),
+        kegiatan: resolve(import.meta.dirname, 'kegiatan.html'),
         siswa: resolve(import.meta.dirname, 'siswa.html'),
         pengaturan: resolve(import.meta.dirname, 'pengaturan.html'),
       },

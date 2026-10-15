@@ -14,6 +14,7 @@ import {
   School,
   Wifi,
   Share2,
+  Trophy,
 } from 'lucide-react';
 import '../index.css';
 
@@ -25,6 +26,7 @@ const PengaturanPage: React.FC = () => {
     if (tab === 'dashboard') window.location.href = 'index.html';
     else if (tab === 'mutasi') window.location.href = 'mutasi.html';
     else if (tab === 'buku-induk') window.location.href = 'buku-induk.html';
+    else if (tab === 'kegiatan') window.location.href = 'kegiatan.html';
     else if (tab === 'cetak-buku') window.location.href = 'cetak-buku.html';
     else if (tab === 'pengaturan') window.location.href = 'pengaturan.html';
   };
@@ -93,6 +95,24 @@ const PengaturanPage: React.FC = () => {
                       <p className="text-xs font-bold text-slate-900">Identitas Sekolah & Dokumen</p>
                       <p className="text-[11px] text-slate-500">
                         Ubah Nama Sekolah, NPSN, NSS, Alamat, dan Tahun Pelajaran
+                      </p>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-slate-400" />
+                </button>
+
+                <button
+                  onClick={() => { window.location.href = 'kegiatan.html'; }}
+                  className="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-amber-400 hover:bg-amber-50/50 transition-all text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs">
+                      <Trophy className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-900">Ekstrakurikuler & Keahlian Wajib</p>
+                      <p className="text-[11px] text-slate-500">
+                        Kelola ekskul dinamis (Robotic, Jiujitsu, Drawing, Cooking, Futsal, Silat) & 4 Keahlian Wajib
                       </p>
                     </div>
                   </div>

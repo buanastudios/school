@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { StudentTimeframeCharts } from './StudentTimeframeCharts';
 import {
+  StudentExtracurricularModal,
+  StudentMustHaveSkillModal,
+} from '../kegiatan/ActivityManagementModule';
+import {
   Award,
   BookOpen,
   CheckCircle2,
@@ -17,6 +21,17 @@ import {
   Trophy,
   User,
   Users,
+  Waves,
+  Compass,
+  Tent,
+  Mountain,
+  Clock,
+  Edit3,
+  Bot,
+  Shield,
+  Palette,
+  UtensilsCrossed,
+  Swords,
 } from 'lucide-react';
 
 interface StudentPublicProfileProps {
@@ -30,7 +45,14 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
   isPublicHallView = false,
   onBack,
 }) => {
-  const { students, schoolProfile } = useApp();
+  const {
+    students,
+    schoolProfile,
+    extracurriculars,
+    mustHaveSkills,
+    updateStudentExtracurriculars,
+    updateStudentMustHaveSkill,
+  } = useApp();
 
   // Extract student ID / NIS from clean path, hash, or query parameters
   const [activeId, setActiveId] = useState<string>(() => {
@@ -88,6 +110,8 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
   const [activeTab, setActiveTab] = useState<'ringkasan' | 'akademik' | 'p5' | 'ekskul' | 'prestasi'>('ringkasan');
   const [copyFeedback, setCopyFeedback] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
+  const [isEditEkskulModalOpen, setIsEditEkskulModalOpen] = useState(false);
+  const [isEditSkillModalOpen, setIsEditSkillModalOpen] = useState(false);
 
   const student = students.find((s) => s.id === activeId) || students[0];
 
@@ -505,116 +529,320 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
       )}
 
       {/* ======================================================== */}
-      {/* SECTION 3: KOKURIKULER (P5 / PROJEK PROFIL PANCASILA)   */}
+      {/* SECTION 3: KOKURIKULER & 4 KEAHLIAN WAJIB SEKOLAH        */}
       {/* ======================================================== */}
       {activeTab === 'p5' && (
-        <div className={`p-5 sm:p-6 rounded-2xl border ${
-          isHallMode ? 'bg-slate-800/80 border-slate-700 text-white' : 'bg-white border-slate-200 shadow-xs'
-        }`}>
-          <div className="border-b pb-3 mb-4 flex items-center justify-between border-slate-200 dark:border-slate-700">
-            <div>
-              <h3 className="text-base font-extrabold flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-amber-400" />
-                <span>Kokurikuler: Projek Penguatan Profil Pelajar Pancasila (P5)</span>
-              </h3>
-              <p className={`text-xs ${isHallMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                Dokumentasi tema projek lintas disiplin ilmu yang telah diselesaikan
-              </p>
+        <div className="space-y-6">
+          {/* Sub-section 3A: 4 Keahlian Wajib Lapangan (Must-Have Skills) */}
+          <div className={`p-5 sm:p-6 rounded-2xl border ${
+            isHallMode ? 'bg-slate-800/80 border-slate-700 text-white' : 'bg-white border-slate-200 shadow-xs'
+          }`}>
+            <div className="border-b pb-3 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-slate-200 dark:border-slate-700">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                  <h3 className="text-base font-black flex items-center gap-2">
+                    <Compass className="w-5 h-5 text-amber-500" />
+                    <span>4 Keahlian Wajib Kokurikuler & Ketangkasan Lapangan</span>
+                  </h3>
+                </div>
+                <p className={`text-xs mt-0.5 ${isHallMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Standar karakter khas Buana School: Olahraga Sunnah (Berenang, Berkuda) & Alam Bebas (Pramuka/Camping, Rope Rappelling)
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  {student.mustHaveSkills?.filter((m) => m.badgeEarned).length || 0} / 4 Lencana Lulus
+                </span>
+                <button
+                  onClick={() => setIsEditSkillModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 shadow-xs transition-all"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Update Uji Keterampilan</span>
+                </button>
+              </div>
             </div>
-            <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
-              {student.cocurriculars?.length || 0} Projek Tuntas
-            </span>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {student.mustHaveSkills?.map((sk) => {
+                const isMahir = sk.levelCapaian === 'Lulus Uji Mandiri / Mahir';
+                const isTerampil = sk.levelCapaian === 'Tingkat Terampil';
+
+                return (
+                  <div
+                    key={sk.kode}
+                    className={`p-4 rounded-2xl border transition-all flex flex-col justify-between ${
+                      isHallMode
+                        ? 'bg-slate-900/60 border-slate-700'
+                        : sk.badgeEarned
+                        ? 'bg-emerald-50/40 border-emerald-200 shadow-2xs'
+                        : 'bg-slate-50/70 border-slate-200'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-xs shrink-0 ${
+                            sk.kode === 'swimming'
+                              ? 'bg-cyan-600 text-white'
+                              : sk.kode === 'horse_riding'
+                              ? 'bg-amber-600 text-white'
+                              : sk.kode === 'camping_skill'
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-indigo-600 text-white'
+                          }`}>
+                            {sk.kode === 'swimming' && <Waves className="w-6 h-6" />}
+                            {sk.kode === 'horse_riding' && <Compass className="w-6 h-6" />}
+                            {sk.kode === 'camping_skill' && <Tent className="w-6 h-6" />}
+                            {sk.kode === 'rope_rappelling' && <Mountain className="w-6 h-6" />}
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                              Must-Have Skill
+                            </span>
+                            <h4 className="font-extrabold text-sm">{sk.nama}</h4>
+                          </div>
+                        </div>
+
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap border ${
+                          isMahir
+                            ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-400/40'
+                            : isTerampil
+                            ? 'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-400/40'
+                            : 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-400/40'
+                        }`}>
+                          {sk.levelCapaian}
+                        </span>
+                      </div>
+
+                      {sk.catatan && (
+                        <p className={`text-xs leading-relaxed my-2.5 ${isHallMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                          "{sk.catatan}"
+                        </p>
+                      )}
+
+                      {sk.pencapaianSpesifik && sk.pencapaianSpesifik.length > 0 && (
+                        <div className="flex flex-wrap gap-1 my-2">
+                          {sk.pencapaianSpesifik.map((p, pIdx) => (
+                            <span
+                              key={pIdx}
+                              className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                            >
+                              ✓ {p}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-2.5 mt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                      <div className="flex items-center gap-1.5 truncate">
+                        <User className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                        <span className="truncate">Penguji: {sk.penguji || 'Instruktur Resmi'}</span>
+                      </div>
+                      {sk.tanggalUjian && (
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Clock className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{sk.tanggalUjian}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {student.cocurriculars?.map((p) => (
-              <div
-                key={p.id}
-                className={`p-4 rounded-xl border flex flex-col justify-between ${
-                  isHallMode ? 'bg-slate-900/60 border-slate-700' : 'bg-amber-50/40 border-amber-200'
-                }`}
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-400/30">
-                      Tema: {p.tema}
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30">
-                      {p.capaian}
-                    </span>
-                  </div>
-
-                  <h4 className="font-extrabold text-sm mb-1">{p.judulProjek}</h4>
-                  <p className={`text-xs leading-relaxed mb-3 ${isHallMode ? 'text-slate-300' : 'text-slate-600'}`}>
-                    {p.deskripsi}
-                  </p>
-                </div>
-
-                <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
-                  <div className="flex flex-wrap gap-1">
-                    {p.dimensi.map((d, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30"
-                      >
-                        ✓ {d}
-                      </span>
-                    ))}
-                  </div>
-                  <p className={`text-[11px] italic ${isHallMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                    Catatan Guru: "{p.keterangan}"
-                  </p>
-                </div>
+          {/* Sub-section 3B: Projek Penguatan Profil Pelajar Pancasila (P5) */}
+          <div className={`p-5 sm:p-6 rounded-2xl border ${
+            isHallMode ? 'bg-slate-800/80 border-slate-700 text-white' : 'bg-white border-slate-200 shadow-xs'
+          }`}>
+            <div className="border-b pb-3 mb-4 flex items-center justify-between border-slate-200 dark:border-slate-700">
+              <div>
+                <h3 className="text-base font-extrabold flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-amber-400" />
+                  <span>Projek Penguatan Profil Pelajar Pancasila (P5)</span>
+                </h3>
+                <p className={`text-xs ${isHallMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Dokumentasi tema projek lintas disiplin ilmu yang telah diselesaikan
+                </p>
               </div>
-            ))}
+              <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                {student.cocurriculars?.length || 0} Projek Tuntas
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {student.cocurriculars?.map((p) => (
+                <div
+                  key={p.id}
+                  className={`p-4 rounded-xl border flex flex-col justify-between ${
+                    isHallMode ? 'bg-slate-900/60 border-slate-700' : 'bg-amber-50/40 border-amber-200'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-400/30">
+                        Tema: {p.tema}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30">
+                        {p.capaian}
+                      </span>
+                    </div>
+
+                    <h4 className="font-extrabold text-sm mb-1">{p.judulProjek}</h4>
+                    <p className={`text-xs leading-relaxed mb-3 ${isHallMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                      {p.deskripsi}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                    <div className="flex flex-wrap gap-1">
+                      {p.dimensi.map((d, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30"
+                        >
+                          ✓ {d}
+                        </span>
+                      ))}
+                    </div>
+                    <p className={`text-[11px] italic ${isHallMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                      Catatan Guru: "{p.keterangan}"
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
       {/* ======================================================== */}
-      {/* SECTION 4: EKSTRAKURIKULER                              */}
+      {/* SECTION 4: EKSTRAKURIKULER DINAMIS                      */}
       {/* ======================================================== */}
       {activeTab === 'ekskul' && (
         <div className={`p-5 sm:p-6 rounded-2xl border ${
           isHallMode ? 'bg-slate-800/80 border-slate-700 text-white' : 'bg-white border-slate-200 shadow-xs'
         }`}>
-          <div className="border-b pb-3 mb-4 border-slate-200 dark:border-slate-700">
-            <h3 className="text-base font-extrabold flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-emerald-500" />
-              <span>Kegiatan Ekstrakurikuler & Pembinaan Bakat</span>
-            </h3>
-            <p className={`text-xs ${isHallMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              Penilaian pembina kepanduan, bela diri, keagamaan, dan seni
-            </p>
+          <div className="border-b pb-3 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-slate-200 dark:border-slate-700">
+            <div>
+              <h3 className="text-base font-extrabold flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-emerald-500" />
+                <span>Pilihan Ekstrakurikuler & Pembinaan Bakat Siswa</span>
+              </h3>
+              <p className={`text-xs ${isHallMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                Kegiatan dinamis berbasis minat: Robotic, Jiujitsu (Grappling), Drawing, Cooking, Futsal, Pencak Silat
+              </p>
+            </div>
+
+            <button
+              onClick={() => setIsEditEkskulModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-all shrink-0"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>Ubah Pilihan Ekskul Siswa</span>
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
-            {student.extracurriculars.map((ek, i) => (
-              <div
-                key={i}
-                className={`p-4 rounded-xl border ${
-                  isHallMode ? 'bg-slate-900/60 border-slate-700' : 'bg-slate-50 border-slate-200'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
-                    {i + 1}
-                  </div>
-                  <h4 className="font-extrabold text-xs leading-snug">{ek.nama}</h4>
-                </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {student.extracurriculars && student.extracurriculars.length > 0 ? (
+              student.extracurriculars.map((ek, i) => {
+                const isSilat = ek.nama.toLowerCase().includes('silat');
+                const isRobotic = ek.nama.toLowerCase().includes('robot');
+                const isJiujitsu = ek.nama.toLowerCase().includes('jiujitsu');
+                const isDrawing = ek.nama.toLowerCase().includes('draw') || ek.nama.toLowerCase().includes('gambar');
+                const isCooking = ek.nama.toLowerCase().includes('cook') || ek.nama.toLowerCase().includes('chef');
+                const isFutsal = ek.nama.toLowerCase().includes('futsal');
 
-                <div className="grid grid-cols-2 gap-2 text-center text-xs mt-3 pt-2 border-t border-slate-200 dark:border-slate-800">
-                  <div className="p-1.5 rounded-lg bg-white/5 border border-white/10">
-                    <span className="text-[10px] opacity-70 block">Semester 1</span>
-                    <strong className="text-emerald-400 font-bold">{ek.nilaiGanjil || 'Baik'}</strong>
+                return (
+                  <div
+                    key={i}
+                    className={`p-4 rounded-2xl border flex flex-col justify-between transition-all ${
+                      isHallMode ? 'bg-slate-900/60 border-slate-700' : 'bg-slate-50 border-slate-200 hover:border-indigo-300'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-xs ${
+                            isSilat
+                              ? 'bg-amber-600'
+                              : isRobotic
+                              ? 'bg-cyan-600'
+                              : isJiujitsu
+                              ? 'bg-rose-600'
+                              : isDrawing
+                              ? 'bg-fuchsia-600'
+                              : isCooking
+                              ? 'bg-emerald-600'
+                              : isFutsal
+                              ? 'bg-blue-600'
+                              : 'bg-indigo-600'
+                          }`}>
+                            {isSilat ? (
+                              <Swords className="w-5 h-5" />
+                            ) : isRobotic ? (
+                              <Bot className="w-5 h-5" />
+                            ) : isJiujitsu ? (
+                              <Shield className="w-5 h-5" />
+                            ) : isDrawing ? (
+                              <Palette className="w-5 h-5" />
+                            ) : isCooking ? (
+                              <UtensilsCrossed className="w-5 h-5" />
+                            ) : isFutsal ? (
+                              <Trophy className="w-5 h-5" />
+                            ) : (
+                              <span>{i + 1}</span>
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="font-extrabold text-xs leading-snug">{ek.nama}</h4>
+                            {ek.pembina && (
+                              <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                                {ek.pembina}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {ek.jadwal && (
+                        <p className="text-[10px] text-indigo-400 font-semibold mb-2 flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          <span>{ek.jadwal}</span>
+                        </p>
+                      )}
+
+                      {(ek.keteranganGenap || ek.keteranganGanjil) && (
+                        <p className={`text-[11px] leading-relaxed italic mb-3 ${
+                          isHallMode ? 'text-slate-300' : 'text-slate-600'
+                        }`}>
+                          "{ek.keteranganGenap || ek.keteranganGanjil}"
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-center text-xs pt-2.5 border-t border-slate-200 dark:border-slate-800">
+                      <div className="p-1.5 rounded-lg bg-white/5 border border-white/10">
+                        <span className="text-[10px] opacity-70 block">Semester 1</span>
+                        <strong className="text-emerald-400 font-bold">{ek.nilaiGanjil || 'Baik'}</strong>
+                      </div>
+                      <div className="p-1.5 rounded-lg bg-white/5 border border-white/10">
+                        <span className="text-[10px] opacity-70 block">Semester 2</span>
+                        <strong className="text-emerald-400 font-bold">{ek.nilaiGenap || 'Sangat Baik'}</strong>
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-1.5 rounded-lg bg-white/5 border border-white/10">
-                    <span className="text-[10px] opacity-70 block">Semester 2</span>
-                    <strong className="text-emerald-400 font-bold">{ek.nilaiGenap || 'Sangat Baik'}</strong>
-                  </div>
-                </div>
+                );
+              })
+            ) : (
+              <div className="col-span-3 p-8 text-center text-slate-400 italic">
+                Siswa belum memilih ekstrakurikuler. Klik tombol "Ubah Pilihan Ekskul Siswa" di atas untuk menambahkan.
               </div>
-            ))}
+            )}
           </div>
         </div>
       )}
@@ -730,6 +958,33 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal Edit Pilihan Ekskul Siswa */}
+      {isEditEkskulModalOpen && (
+        <StudentExtracurricularModal
+          isOpen={isEditEkskulModalOpen}
+          student={student}
+          availableEkskuls={extracurriculars}
+          onClose={() => setIsEditEkskulModalOpen(false)}
+          onSave={(updated) => {
+            updateStudentExtracurriculars(student.id, updated);
+            setIsEditEkskulModalOpen(false);
+          }}
+        />
+      )}
+
+      {/* Modal Uji Kompetensi Keahlian Wajib */}
+      {isEditSkillModalOpen && (
+        <StudentMustHaveSkillModal
+          isOpen={isEditSkillModalOpen}
+          student={student}
+          skillsMaster={mustHaveSkills}
+          onClose={() => setIsEditSkillModalOpen(false)}
+          onSave={(skillKode, record) => {
+            updateStudentMustHaveSkill(student.id, skillKode, record);
+          }}
+        />
       )}
     </div>
   );

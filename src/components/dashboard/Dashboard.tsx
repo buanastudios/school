@@ -10,6 +10,7 @@ import {
   Sparkles,
   Calendar,
   ExternalLink,
+  Trophy,
 } from 'lucide-react';
 import type { NavTab } from '../common/BottomNav';
 
@@ -98,6 +99,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onOpenAddModal
               <Printer className="w-4 h-4 text-amber-300" />
               <span>Cetak Buku Mutasi</span>
             </button>
+            <a
+              href="kegiatan.html"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs shadow-md transition-all active:scale-95"
+            >
+              <Trophy className="w-4 h-4 text-slate-950" />
+              <span>Ekskul & 4 Keahlian Wajib</span>
+            </a>
           </div>
         </div>
 

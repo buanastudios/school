@@ -7,6 +7,10 @@ import type {
   StudentMasterRecord,
   MonthlyRekapitulasi,
   MonthlyClassRekap,
+  ExtracurricularMaster,
+  MustHaveSkillMaster,
+  StudentMustHaveSkillRecord,
+  Extracurricular,
 } from '../types';
 import {
   initialSchoolProfile,
@@ -14,6 +18,9 @@ import {
   initialMutations,
   initialStudents,
   baselineClassCounts,
+  initialExtracurriculars,
+  initialMustHaveSkills,
+  getDefaultMustHaveSkillsForStudent,
 } from '../data/initialData';
 
 interface AppContextType {
@@ -35,6 +42,28 @@ interface AppContextType {
   addStudent: (student: Omit<StudentMasterRecord, 'id' | 'noUrutBukuInduk'>) => void;
   updateStudent: (id: string, data: Partial<StudentMasterRecord>) => void;
   deleteStudent: (id: string) => void;
+
+  // Ekstrakurikuler Dinamis (Robotic, Jiujitsu, Drawing, Cooking, Futsal, Silat, dll)
+  extracurriculars: ExtracurricularMaster[];
+  addExtracurricular: (ekskul: Omit<ExtracurricularMaster, 'id'>) => void;
+  updateExtracurricular: (id: string, data: Partial<ExtracurricularMaster>) => void;
+  toggleExtracurricularStatus: (id: string) => void;
+  deleteExtracurricular: (id: string) => void;
+
+  // Kokurikuler & Must-Have Skills (Swimming, Horse Riding, Camping Skill, Rope Rappelling)
+  mustHaveSkills: MustHaveSkillMaster[];
+  addMustHaveSkill: (skill: Omit<MustHaveSkillMaster, 'id'>) => void;
+  updateMustHaveSkill: (id: string, data: Partial<MustHaveSkillMaster>) => void;
+  toggleMustHaveSkillStatus: (id: string) => void;
+  deleteMustHaveSkill: (id: string) => void;
+
+  // Student specific activity management
+  updateStudentExtracurriculars: (studentId: string, ekskuls: Extracurricular[]) => void;
+  updateStudentMustHaveSkill: (
+    studentId: string,
+    skillKode: string,
+    record: Partial<StudentMustHaveSkillRecord>
+  ) => void;
 
   getMonthlyRekap: (bulan: number, tahun: number, tahunPelajaran: string) => MonthlyRekapitulasi;
   exportDataAsJson: () => string;
@@ -81,13 +110,45 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length >= initialStudents.length) {
-          return parsed;
+          return parsed.map((st: StudentMasterRecord) => ({
+            ...st,
+            mustHaveSkills:
+              st.mustHaveSkills && st.mustHaveSkills.length > 0
+                ? st.mustHaveSkills
+                : getDefaultMustHaveSkillsForStudent(st.kelas),
+          }));
         }
       } catch (e) {
         console.error(e);
       }
     }
     return initialStudents;
+  });
+
+  const [extracurriculars, setExtracurriculars] = useState<ExtracurricularMaster[]>(() => {
+    const saved = localStorage.getItem(`${STORAGE_KEY}_extracurriculars`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return initialExtracurriculars;
+  });
+
+  const [mustHaveSkills, setMustHaveSkills] = useState<MustHaveSkillMaster[]>(() => {
+    const saved = localStorage.getItem(`${STORAGE_KEY}_must_have_skills`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return initialMustHaveSkills;
   });
 
   // Save changes to localStorage
@@ -110,6 +171,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY}_students`, JSON.stringify(students));
   }, [students]);
+
+  useEffect(() => {
+    localStorage.setItem(`${STORAGE_KEY}_extracurriculars`, JSON.stringify(extracurriculars));
+  }, [extracurriculars]);
+
+  useEffect(() => {
+    localStorage.setItem(`${STORAGE_KEY}_must_have_skills`, JSON.stringify(mustHaveSkills));
+  }, [mustHaveSkills]);
 
   const updateSchoolProfile = (profile: Partial<SchoolProfile>) => {
     setSchoolProfile((prev) => ({ ...prev, ...profile }));
@@ -284,14 +353,87 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   };
 
+  const addExtracurricular = (ekskul: Omit<ExtracurricularMaster, 'id'>) => {
+    const newEkskul: ExtracurricularMaster = {
+      ...ekskul,
+      id: `ek-${Date.now()}`,
+    };
+    setExtracurriculars((prev) => [newEkskul, ...prev]);
+  };
+
+  const updateExtracurricular = (id: string, data: Partial<ExtracurricularMaster>) => {
+    setExtracurriculars((prev) => prev.map((e) => (e.id === id ? { ...e, ...data } : e)));
+  };
+
+  const toggleExtracurricularStatus = (id: string) => {
+    setExtracurriculars((prev) =>
+      prev.map((e) =>
+        e.id === id ? { ...e, status: e.status === 'aktif' ? 'nonaktif' : 'aktif' } : e
+      )
+    );
+  };
+
+  const deleteExtracurricular = (id: string) => {
+    setExtracurriculars((prev) => prev.filter((e) => e.id !== id));
+  };
+
+  const addMustHaveSkill = (skill: Omit<MustHaveSkillMaster, 'id'>) => {
+    const newSkill: MustHaveSkillMaster = {
+      ...skill,
+      id: `mhs-${Date.now()}`,
+    };
+    setMustHaveSkills((prev) => [...prev, newSkill]);
+  };
+
+  const updateMustHaveSkill = (id: string, data: Partial<MustHaveSkillMaster>) => {
+    setMustHaveSkills((prev) => prev.map((s) => (s.id === id ? { ...s, ...data } : s)));
+  };
+
+  const toggleMustHaveSkillStatus = (id: string) => {
+    setMustHaveSkills((prev) =>
+      prev.map((s) =>
+        s.id === id ? { ...s, status: s.status === 'aktif' ? 'nonaktif' : 'aktif' } : s
+      )
+    );
+  };
+
+  const deleteMustHaveSkill = (id: string) => {
+    setMustHaveSkills((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  const updateStudentExtracurriculars = (studentId: string, ekskuls: Extracurricular[]) => {
+    setStudents((prev) =>
+      prev.map((s) => (s.id === studentId ? { ...s, extracurriculars: ekskuls } : s))
+    );
+  };
+
+  const updateStudentMustHaveSkill = (
+    studentId: string,
+    skillKode: string,
+    record: Partial<StudentMustHaveSkillRecord>
+  ) => {
+    setStudents((prev) =>
+      prev.map((s) => {
+        if (s.id !== studentId) return s;
+        const currentSkills = s.mustHaveSkills || getDefaultMustHaveSkillsForStudent(s.kelas);
+        const updatedSkills = currentSkills.map((sk) =>
+          sk.kode === skillKode ? { ...sk, ...record } : sk
+        );
+        return { ...s, mustHaveSkills: updatedSkills };
+      })
+    );
+  };
+
   const exportDataAsJson = (): string => {
     const payload = {
-      version: '1.0',
+      version: '1.1',
       exportedAt: new Date().toISOString(),
       schoolProfile,
       users,
       mutations,
       students,
+      extracurriculars,
+      mustHaveSkills,
     };
     return JSON.stringify(payload, null, 2);
   };
@@ -303,6 +445,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (data.users && Array.isArray(data.users)) setUsers(data.users);
       if (data.mutations && Array.isArray(data.mutations)) setMutations(data.mutations);
       if (data.students && Array.isArray(data.students)) setStudents(data.students);
+      if (data.extracurriculars && Array.isArray(data.extracurriculars)) setExtracurriculars(data.extracurriculars);
+      if (data.mustHaveSkills && Array.isArray(data.mustHaveSkills)) setMustHaveSkills(data.mustHaveSkills);
       return true;
     } catch (e) {
       console.error('Import failed', e);
@@ -316,11 +460,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCurrentUserState(initialUsers.find((u) => u.assignedClass === 1) || initialUsers[0]);
     setMutations(initialMutations);
     setStudents(initialStudents);
+    setExtracurriculars(initialExtracurriculars);
+    setMustHaveSkills(initialMustHaveSkills);
     localStorage.removeItem(`${STORAGE_KEY}_school`);
     localStorage.removeItem(`${STORAGE_KEY}_users`);
     localStorage.removeItem(`${STORAGE_KEY}_current_user`);
     localStorage.removeItem(`${STORAGE_KEY}_mutations`);
     localStorage.removeItem(`${STORAGE_KEY}_students`);
+    localStorage.removeItem(`${STORAGE_KEY}_extracurriculars`);
+    localStorage.removeItem(`${STORAGE_KEY}_must_have_skills`);
   };
 
   return (
@@ -342,6 +490,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         addStudent,
         updateStudent,
         deleteStudent,
+        extracurriculars,
+        addExtracurricular,
+        updateExtracurricular,
+        toggleExtracurricularStatus,
+        deleteExtracurricular,
+        mustHaveSkills,
+        addMustHaveSkill,
+        updateMustHaveSkill,
+        toggleMustHaveSkillStatus,
+        deleteMustHaveSkill,
+        updateStudentExtracurriculars,
+        updateStudentMustHaveSkill,
         getMonthlyRekap,
         exportDataAsJson,
         importDataFromJson,
