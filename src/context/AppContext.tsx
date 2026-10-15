@@ -77,7 +77,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const [students, setStudents] = useState<StudentMasterRecord[]>(() => {
     const saved = localStorage.getItem(`${STORAGE_KEY}_students`);
-    return saved ? JSON.parse(saved) : initialStudents;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= initialStudents.length) {
+          return parsed;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return initialStudents;
   });
 
   // Save changes to localStorage

@@ -36,7 +36,19 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
   const [activeId, setActiveId] = useState<string>(() => {
     if (studentId) return studentId;
     const params = new URLSearchParams(window.location.search);
-    return params.get('id') || students[0]?.id || '';
+    const idParam = params.get('id');
+    if (idParam) return idParam;
+    const namaParam = params.get('nama');
+    const nisParam = params.get('nis');
+    if (nisParam || namaParam) {
+      const match = students.find((s) => {
+        if (nisParam && s.noInduk === nisParam) return true;
+        if (namaParam && s.namaLengkap.toLowerCase().includes(namaParam.toLowerCase())) return true;
+        return false;
+      });
+      if (match) return match.id;
+    }
+    return students[0]?.id || '';
   });
 
   const [isHallMode, setIsHallMode] = useState<boolean>(() => {
@@ -80,6 +92,13 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
       ? (latestHistorical.nilaiRataRata - firstHistorical.nilaiRataRata).toFixed(1)
       : '0.0';
 
+
+  // Determine Kurikulum Merdeka Phase
+  const getFase = (kelas: number) => {
+    if (kelas <= 2) return 'Fase A';
+    if (kelas <= 4) return 'Fase B';
+    return 'Fase C';
+  };
 
   return (
     <div className={`space-y-6 pb-24 md:pb-12 ${isHallMode ? 'bg-slate-900 text-white min-h-screen p-4 sm:p-8 -m-3.5 sm:-m-6 lg:-m-8' : ''}`}>
@@ -150,6 +169,43 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
         </div>
       </div>
 
+      {/* Quick Student Switcher Bar (Explore All Grades 1 to 6) */}
+      <div className={`p-3 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
+        isHallMode ? 'bg-slate-800/80 border-slate-700' : 'bg-slate-50 border-slate-200'
+      }`}>
+        <div className="flex items-center gap-2">
+          <Users className="w-4 h-4 text-indigo-500 shrink-0" />
+          <span className="text-xs font-extrabold text-slate-600 dark:text-slate-300 shrink-0">
+            Pilih Siswa (Kelas 1 - 6):
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+          {students.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => {
+                setActiveId(s.id);
+                const url = new URL(window.location.href);
+                url.searchParams.set('id', s.id);
+                window.history.replaceState({}, '', url.toString());
+              }}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                s.id === student.id
+                  ? 'bg-indigo-600 text-white shadow-xs scale-102 ring-2 ring-indigo-400'
+                  : isHallMode
+                  ? 'bg-slate-700/80 text-slate-300 hover:bg-slate-700 hover:text-white'
+                  : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${
+                s.kelas === 6 ? 'bg-amber-400' : s.kelas >= 4 ? 'bg-blue-400' : 'bg-emerald-400'
+              }`} />
+              <span>Kls {s.kelas} • {s.namaPanggilan || s.namaLengkap.split(' ')[0]}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* ======================================================== */}
       {/* HERO BANNER: STUDENT SPOTLIGHT & HALL OF FAME           */}
       {/* ======================================================== */}
@@ -183,7 +239,7 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
           <div className="flex-1 text-center md:text-left min-w-0 space-y-2.5">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
               <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-white/20 text-white backdrop-blur-md border border-white/20">
-                Kelas {student.kelas} • Fase A
+                Kelas {student.kelas} • {getFase(student.kelas)}
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/25 text-emerald-300 border border-emerald-400/30">
                 Status: {student.statusSiswa}
@@ -297,54 +353,60 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
                   <span>Grafik Perkembangan Nilai Siswa (Sejak Masuk Sekolah)</span>
                 </h3>
                 <p className={`text-xs ${isHallMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Visualisasi grafik tren rata-rata capaian akademik per semester
+                  Visualisasi grafik tren rata-rata capaian akademik per semester ({student.historicalScores?.length || 0} Semester Terekam)
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-500/20 px-2.5 py-1 rounded-full border border-emerald-500/30">
+                <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border ${
+                  Number(avgImprovement) >= 0
+                    ? 'text-emerald-400 bg-emerald-500/20 border-emerald-500/30'
+                    : 'text-amber-400 bg-amber-500/20 border-amber-500/30'
+                }`}>
                   <Flame className="w-3.5 h-3.5" />
-                  Tren Meningkat (+{avgImprovement}%)
+                  {Number(avgImprovement) >= 0 ? `Tren Meningkat (+${avgImprovement} Poin)` : `Tren Fluktuatif (${avgImprovement} Poin)`}
                 </span>
               </div>
             </div>
 
-            {/* SVG Line / Bar Progression Graph */}
-            <div className="w-full h-64 relative flex items-end justify-around pt-6 pb-8 px-4 border-b border-slate-200 dark:border-slate-700">
-              {/* Background horizontal grid lines */}
-              <div className="absolute inset-x-0 top-6 border-b border-dashed border-slate-200 dark:border-slate-700/60 pointer-events-none">
-                <span className="text-[10px] text-slate-400 absolute -top-3 left-1">100 (Sempurna)</span>
+            {/* Horizontally Scrollable Bar Progression Graph (Smooth on Smartphones & Tablets) */}
+            <div className="w-full overflow-x-auto pb-4 scrollbar-thin">
+              <div className="min-w-[680px] md:min-w-full h-64 relative flex items-end justify-between sm:justify-around pt-6 pb-8 px-4 border-b border-slate-200 dark:border-slate-700">
+                {/* Background horizontal grid lines */}
+                <div className="absolute inset-x-0 top-6 border-b border-dashed border-slate-200 dark:border-slate-700/60 pointer-events-none">
+                  <span className="text-[10px] text-slate-400 absolute -top-3 left-1">100 (Sempurna)</span>
+                </div>
+                <div className="absolute inset-x-0 top-1/2 border-b border-dashed border-slate-200 dark:border-slate-700/60 pointer-events-none">
+                  <span className="text-[10px] text-slate-400 absolute -top-3 left-1">75 (Batas KKTP)</span>
+                </div>
+
+                {student.historicalScores?.map((h, i) => {
+                  const heightPercent = Math.min(100, Math.max(30, (h.nilaiRataRata / 100) * 100));
+                  return (
+                    <div key={i} className="flex flex-col items-center gap-1.5 h-full justify-end z-10 min-w-[3.6rem] sm:min-w-[4.5rem]">
+                      {/* Score Bubble */}
+                      <div className="px-1.5 py-0.5 rounded-lg bg-indigo-600 text-white font-black text-[11px] sm:text-xs shadow-md">
+                        {h.nilaiRataRata}
+                      </div>
+
+                      {/* Bar */}
+                      <div
+                        style={{ height: `${heightPercent}%` }}
+                        className="w-7 sm:w-11 rounded-t-xl bg-gradient-to-t from-indigo-700 via-indigo-600 to-blue-400 shadow-md relative group transition-all duration-500"
+                      >
+                        <div className="absolute inset-0 bg-white/20 rounded-t-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+
+                      {/* Bottom Label */}
+                      <div className="text-center mt-1">
+                        <span className="text-[11px] sm:text-xs font-black block whitespace-nowrap">{h.semesterLabel}</span>
+                        <span className={`text-[9px] sm:text-[10px] block whitespace-nowrap ${isHallMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                          TP {h.tahunPelajaran}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <div className="absolute inset-x-0 top-1/2 border-b border-dashed border-slate-200 dark:border-slate-700/60 pointer-events-none">
-                <span className="text-[10px] text-slate-400 absolute -top-3 left-1">75 (Batas KKTP)</span>
-              </div>
-
-              {student.historicalScores?.map((h, i) => {
-                const heightPercent = Math.min(100, Math.max(30, (h.nilaiRataRata / 100) * 100));
-                return (
-                  <div key={i} className="flex flex-col items-center gap-2 h-full justify-end z-10 w-24">
-                    {/* Score Bubble */}
-                    <div className="px-2 py-0.5 rounded-lg bg-indigo-600 text-white font-black text-xs shadow-md animate-bounce">
-                      {h.nilaiRataRata}
-                    </div>
-
-                    {/* Bar */}
-                    <div
-                      style={{ height: `${heightPercent}%` }}
-                      className="w-14 rounded-t-xl bg-gradient-to-t from-indigo-700 via-indigo-600 to-blue-400 shadow-md relative group transition-all duration-500"
-                    >
-                      <div className="absolute inset-0 bg-white/20 rounded-t-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-
-                    {/* Bottom Label */}
-                    <div className="text-center mt-2">
-                      <span className="text-xs font-black block">{h.semesterLabel}</span>
-                      <span className={`text-[10px] ${isHallMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                        TP {h.tahunPelajaran}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
             </div>
 
             <div className="mt-4 pt-3 flex flex-wrap items-center justify-between text-xs gap-3">

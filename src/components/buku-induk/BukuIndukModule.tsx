@@ -301,7 +301,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
               >
                 {students.map((st) => (
                   <option key={st.id} value={st.id}>
-                    {st.noUrutBukuInduk}. {st.namaLengkap} (NIS: {st.noInduk})
+                    Kelas {st.kelas} • {st.noUrutBukuInduk}. {st.namaLengkap} (NIS: {st.noInduk})
                   </option>
                 ))}
               </select>
@@ -564,7 +564,9 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
               </div>
               <div>
                 <span className="text-slate-500 block text-[10px] font-bold">Kelas / Fase</span>
-                <span className="font-bold text-slate-900">Kelas {selectedStudent.kelas} (Fase A)</span>
+                <span className="font-bold text-slate-900">
+                  Kelas {selectedStudent.kelas} ({selectedStudent.kelas <= 2 ? 'Fase A' : selectedStudent.kelas <= 4 ? 'Fase B' : 'Fase C'})
+                </span>
               </div>
               <div>
                 <span className="text-slate-500 block text-[10px] font-bold">Tahun Pelajaran</span>
