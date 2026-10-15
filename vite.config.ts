@@ -1,11 +1,30 @@
 import { resolve } from 'path'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+// Clean URL rewrite middleware for Vite Dev Server (supports /siswa/:nis -> /siswa.html?nis=:nis)
+function cleanUrlPlugin(): Plugin {
+  return {
+    name: 'clean-url-rewrite',
+    configureServer(server) {
+      server.middlewares.use((req, _res, next) => {
+        if (!req.url) return next();
+        const match = req.url.match(/^\/siswa\/([a-zA-Z0-9_-]+)(\?.*)?$/);
+        if (match) {
+          const nis = match[1];
+          const query = match[2] ? match[2] + '&' : '?';
+          req.url = `/siswa.html${query}nis=${nis}`;
+        }
+        next();
+      });
+    },
+  };
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), cleanUrlPlugin()],
   base: './', // Essential for GitHub Pages hosting (relative paths)
   build: {
     rollupOptions: {

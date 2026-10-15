@@ -380,7 +380,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onOpenAddModal
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <a
-                        href={`siswa.html?nama=${encodeURIComponent(mut.namaSiswa)}&nis=${mut.noInduk}`}
+                        href={`siswa.html?nis=${encodeURIComponent(mut.noInduk)}`}
                         className="text-xs font-bold text-slate-900 hover:text-indigo-600 hover:underline truncate inline-flex items-center gap-1 group"
                         title="Buka Rekam Jejak Siswa"
                       >

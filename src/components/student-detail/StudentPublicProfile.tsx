@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { StudentTimeframeCharts } from './StudentTimeframeCharts';
 import {
   Award,
   BookOpen,
   CheckCircle2,
   ChevronLeft,
   Copy,
-  Flame,
   Maximize2,
   Minimize2,
   QrCode,
@@ -32,22 +32,50 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
 }) => {
   const { students, schoolProfile } = useApp();
 
-  // Extract student ID from prop or URL params
+  // Extract student ID / NIS from clean path, hash, or query parameters
   const [activeId, setActiveId] = useState<string>(() => {
     if (studentId) return studentId;
-    const params = new URLSearchParams(window.location.search);
-    const idParam = params.get('id');
-    if (idParam) return idParam;
-    const namaParam = params.get('nama');
-    const nisParam = params.get('nis');
-    if (nisParam || namaParam) {
-      const match = students.find((s) => {
-        if (nisParam && s.noInduk === nisParam) return true;
-        if (namaParam && s.namaLengkap.toLowerCase().includes(namaParam.toLowerCase())) return true;
-        return false;
-      });
+
+    // 1. Check clean path e.g. /siswa/2425010009 or /buana-school/siswa/2425010009
+    const pathMatch = window.location.pathname.match(/\/siswa\/([a-zA-Z0-9_-]+)/);
+    if (pathMatch) {
+      const p = pathMatch[1];
+      const match = students.find((s) => s.noInduk === p || s.nisn === p || s.id === p);
       if (match) return match.id;
     }
+
+    // 2. Check hash routing e.g. #/siswa/2425010009 or #2425010009
+    const hashMatch = window.location.hash.match(/#(?:\/siswa\/|\/)?([a-zA-Z0-9_-]+)/);
+    if (hashMatch) {
+      const h = hashMatch[1];
+      const match = students.find((s) => s.noInduk === h || s.nisn === h || s.id === h);
+      if (match) return match.id;
+    }
+
+    // 3. Check search query parameter ?nis=... (Primary official student ID)
+    const params = new URLSearchParams(window.location.search);
+    const nisParam = params.get('nis');
+    if (nisParam) {
+      const match = students.find((s) => s.noInduk === nisParam || s.nisn === nisParam);
+      if (match) return match.id;
+    }
+
+    // 4. Fallback search query parameter ?id=...
+    const idParam = params.get('id');
+    if (idParam) {
+      const match = students.find((s) => s.id === idParam || s.noInduk === idParam);
+      if (match) return match.id;
+    }
+
+    // 5. Fallback search query parameter ?nama=...
+    const namaParam = params.get('nama');
+    if (namaParam) {
+      const match = students.find((s) =>
+        s.namaLengkap.toLowerCase().includes(namaParam.toLowerCase())
+      );
+      if (match) return match.id;
+    }
+
     return students[0]?.id || '';
   });
 
@@ -76,7 +104,7 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
     );
   }
 
-  const shareableUrl = `${window.location.origin}${window.location.pathname}?id=${student.id}&public=true`;
+  const shareableUrl = `${window.location.origin}${window.location.pathname.replace(/\/siswa\/.*$/, '/siswa.html')}?nis=${student.noInduk}&public=true`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareableUrl);
@@ -186,7 +214,8 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
               onClick={() => {
                 setActiveId(s.id);
                 const url = new URL(window.location.href);
-                url.searchParams.set('id', s.id);
+                url.searchParams.set('nis', s.noInduk);
+                url.searchParams.delete('id');
                 window.history.replaceState({}, '', url.toString());
               }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
@@ -342,89 +371,8 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
       {/* ======================================================== */}
       {activeTab === 'ringkasan' && (
         <div className="space-y-6">
-          {/* Visual Score Progression Chart (Since Beginning of Joining) */}
-          <div className={`p-5 sm:p-6 rounded-2xl border ${
-            isHallMode ? 'bg-slate-800/80 border-slate-700 text-white' : 'bg-white border-slate-200 shadow-xs'
-          }`}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
-              <div>
-                <h3 className="text-base font-extrabold flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-indigo-500" />
-                  <span>Grafik Perkembangan Nilai Siswa (Sejak Masuk Sekolah)</span>
-                </h3>
-                <p className={`text-xs ${isHallMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Visualisasi grafik tren rata-rata capaian akademik per semester ({student.historicalScores?.length || 0} Semester Terekam)
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border ${
-                  Number(avgImprovement) >= 0
-                    ? 'text-emerald-400 bg-emerald-500/20 border-emerald-500/30'
-                    : 'text-amber-400 bg-amber-500/20 border-amber-500/30'
-                }`}>
-                  <Flame className="w-3.5 h-3.5" />
-                  {Number(avgImprovement) >= 0 ? `Tren Meningkat (+${avgImprovement} Poin)` : `Tren Fluktuatif (${avgImprovement} Poin)`}
-                </span>
-              </div>
-            </div>
-
-            {/* Horizontally Scrollable Bar Progression Graph (Smooth on Smartphones & Tablets) */}
-            <div className="w-full overflow-x-auto pb-4 scrollbar-thin">
-              <div className="min-w-[680px] md:min-w-full h-64 relative flex items-end justify-between sm:justify-around pt-6 pb-8 px-4 border-b border-slate-200 dark:border-slate-700">
-                {/* Background horizontal grid lines */}
-                <div className="absolute inset-x-0 top-6 border-b border-dashed border-slate-200 dark:border-slate-700/60 pointer-events-none">
-                  <span className="text-[10px] text-slate-400 absolute -top-3 left-1">100 (Sempurna)</span>
-                </div>
-                <div className="absolute inset-x-0 top-1/2 border-b border-dashed border-slate-200 dark:border-slate-700/60 pointer-events-none">
-                  <span className="text-[10px] text-slate-400 absolute -top-3 left-1">75 (Batas KKTP)</span>
-                </div>
-
-                {student.historicalScores?.map((h, i) => {
-                  const heightPercent = Math.min(100, Math.max(30, (h.nilaiRataRata / 100) * 100));
-                  return (
-                    <div key={i} className="flex flex-col items-center gap-1.5 h-full justify-end z-10 min-w-[3.6rem] sm:min-w-[4.5rem]">
-                      {/* Score Bubble */}
-                      <div className="px-1.5 py-0.5 rounded-lg bg-indigo-600 text-white font-black text-[11px] sm:text-xs shadow-md">
-                        {h.nilaiRataRata}
-                      </div>
-
-                      {/* Bar */}
-                      <div
-                        style={{ height: `${heightPercent}%` }}
-                        className="w-7 sm:w-11 rounded-t-xl bg-gradient-to-t from-indigo-700 via-indigo-600 to-blue-400 shadow-md relative group transition-all duration-500"
-                      >
-                        <div className="absolute inset-0 bg-white/20 rounded-t-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-
-                      {/* Bottom Label */}
-                      <div className="text-center mt-1">
-                        <span className="text-[11px] sm:text-xs font-black block whitespace-nowrap">{h.semesterLabel}</span>
-                        <span className={`text-[9px] sm:text-[10px] block whitespace-nowrap ${isHallMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                          TP {h.tahunPelajaran}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="mt-4 pt-3 flex flex-wrap items-center justify-between text-xs gap-3">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-indigo-600" />
-                  <span className={isHallMode ? 'text-slate-300' : 'text-slate-600'}>Nilai Rata-rata Ujian & Tugas</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-0.5 border-b-2 border-dashed border-emerald-500" />
-                  <span className={isHallMode ? 'text-slate-300' : 'text-slate-600'}>KKTP Minimum (75)</span>
-                </div>
-              </div>
-              <p className={`text-[11px] ${isHallMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                *Data diperbarui secara otomatis setiap kali guru menginput nilai rapor.
-              </p>
-            </div>
-          </div>
+          {/* Multi-Timeframe Charts: Monthly Line Graph, Semester Grouped Bar, Yearly Dual-Axis */}
+          <StudentTimeframeCharts student={student} isHallMode={isHallMode} />
 
           {/* Subject by Subject Mastery Progress Grid */}
           <div className={`p-5 sm:p-6 rounded-2xl border ${
@@ -756,8 +704,14 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
               </div>
             </div>
 
-            <div className="text-xs font-mono text-slate-400 truncate">
-              {shareableUrl}
+            <div className="space-y-1 text-left bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+              <span className="text-[10px] text-slate-400 font-bold block">Tautan Resmi Publik (NIS):</span>
+              <div className="text-[11px] font-mono font-bold text-indigo-700 truncate select-all">
+                {shareableUrl}
+              </div>
+              <div className="text-[10px] font-mono text-slate-400 truncate">
+                Format Singkat: {window.location.origin}/siswa/{student.noInduk}
+              </div>
             </div>
 
             <div className="flex gap-2">
