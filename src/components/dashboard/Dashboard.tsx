@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { getStudentUrl } from '../../utils/routing';
 import {
   Users,
   UserPlus,
@@ -388,7 +389,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onOpenAddModal
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <a
-                        href={`siswa.html?nis=${encodeURIComponent(mut.noInduk)}`}
+                        href={getStudentUrl(mut.noInduk)}
                         className="text-xs font-bold text-slate-900 hover:text-indigo-600 hover:underline truncate inline-flex items-center gap-1 group"
                         title="Buka Rekam Jejak Siswa"
                       >

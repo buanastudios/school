@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { StudentTimeframeCharts } from './StudentTimeframeCharts';
+import { getStudentUrl, getFullStudentUrl } from '../../utils/routing';
 import {
   StudentExtracurricularModal,
   StudentMustHaveSkillModal,
@@ -120,6 +121,16 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
     if (studentId) setActiveId(studentId);
   }, [studentId]);
 
+  useEffect(() => {
+    if (student?.noInduk) {
+      const cleanUrl = getStudentUrl(student.noInduk);
+      // Ensure browser address bar updates to clean /siswa/:nis format
+      if (window.location.pathname.endsWith('siswa.html') || window.location.search.includes('nis=')) {
+        window.history.replaceState({}, '', cleanUrl);
+      }
+    }
+  }, [student?.noInduk]);
+
   if (!student) {
     return (
       <div className="p-8 text-center text-slate-500">
@@ -128,7 +139,7 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
     );
   }
 
-  const shareableUrl = `${window.location.origin}${window.location.pathname.replace(/\/siswa\/.*$/, '/siswa.html')}?nis=${student.noInduk}&public=true`;
+  const shareableUrl = getFullStudentUrl(student.noInduk);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareableUrl);
@@ -237,10 +248,7 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
               key={s.id}
               onClick={() => {
                 setActiveId(s.id);
-                const url = new URL(window.location.href);
-                url.searchParams.set('nis', s.noInduk);
-                url.searchParams.delete('id');
-                window.history.replaceState({}, '', url.toString());
+                window.history.replaceState({}, '', getStudentUrl(s.noInduk));
               }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                 s.id === student.id
@@ -933,12 +941,9 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
             </div>
 
             <div className="space-y-1 text-left bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-              <span className="text-[10px] text-slate-400 font-bold block">Tautan Resmi Publik (NIS):</span>
+              <span className="text-[10px] text-slate-400 font-bold block">Tautan Resmi Publik (Clean URL):</span>
               <div className="text-[11px] font-mono font-bold text-indigo-700 truncate select-all">
                 {shareableUrl}
-              </div>
-              <div className="text-[10px] font-mono text-slate-400 truncate">
-                Format Singkat: {window.location.origin}/siswa/{student.noInduk}
               </div>
             </div>
 

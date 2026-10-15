@@ -28,6 +28,7 @@ import {
   Award,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { getStudentUrl } from '../../utils/routing';
 import type {
   ExtracurricularMaster,
   MustHaveSkillMaster,
@@ -652,7 +653,7 @@ export const ActivityManagementModule: React.FC = () => {
                             </div>
                             <div>
                               <a
-                                href={`siswa.html?nis=${encodeURIComponent(s.noInduk)}`}
+                                href={getStudentUrl(s.noInduk)}
                                 className="font-bold text-slate-900 hover:text-indigo-600 hover:underline flex items-center gap-1"
                               >
                                 <span>{s.namaLengkap}</span>

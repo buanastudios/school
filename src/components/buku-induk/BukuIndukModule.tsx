@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { getStudentUrl } from '../../utils/routing';
 import {
   BookOpen,
   Search,
@@ -224,7 +225,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
                       </td>
                       <td className="py-2.5 px-3 font-bold text-indigo-950">
                         <a
-                          href={`siswa.html?nis=${encodeURIComponent(s.noInduk)}`}
+                          href={getStudentUrl(s.noInduk)}
                           className="text-indigo-600 hover:text-indigo-900 font-bold hover:underline inline-flex items-center gap-1 group"
                           title="Buka Rekam Jejak & Live School Hall Siswa"
                         >
@@ -257,7 +258,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
                       <td className="py-2.5 px-3 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <a
-                            href={`siswa.html?nis=${encodeURIComponent(s.noInduk)}`}
+                            href={getStudentUrl(s.noInduk)}
                             className="inline-flex items-center gap-1 text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2 py-1 rounded-lg border border-indigo-200 transition-colors"
                             title="Tampilkan di Layar Aula / Rekam Publik"
                           >

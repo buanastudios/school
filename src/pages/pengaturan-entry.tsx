@@ -16,6 +16,7 @@ import {
   Share2,
   Trophy,
 } from 'lucide-react';
+import { getStudentUrl } from '../utils/routing';
 import '../index.css';
 
 const PengaturanPage: React.FC = () => {
@@ -155,7 +156,7 @@ const PengaturanPage: React.FC = () => {
               </p>
               <div className="pt-2 flex flex-wrap gap-2 text-xs">
                 <a
-                  href="siswa.html"
+                  href={getStudentUrl('2425010009')}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium border border-white/20"
                 >
                   <Share2 className="w-3.5 h-3.5 text-amber-300" />

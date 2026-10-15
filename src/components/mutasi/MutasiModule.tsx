@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { getStudentUrl } from '../../utils/routing';
 import type { StudentMutation, MutationType } from '../../types';
 import {
   UserPlus,
@@ -304,7 +305,7 @@ export const MutasiModule: React.FC<MutasiModuleProps> = ({ onOpenAddModal, onOp
                       </td>
                       <td className="py-2.5 px-3 font-bold text-slate-900">
                         <a
-                          href={`siswa.html?nis=${encodeURIComponent(m.noInduk)}`}
+                          href={getStudentUrl(m.noInduk)}
                           className="text-indigo-600 hover:text-indigo-900 font-bold hover:underline inline-flex items-center gap-1 group"
                           title="Lihat Detail & Rekam Prestasi Siswa"
                         >
@@ -430,7 +431,7 @@ export const MutasiModule: React.FC<MutasiModuleProps> = ({ onOpenAddModal, onOp
                       </td>
                       <td className="py-2.5 px-3 font-bold text-slate-900">
                         <a
-                          href={`siswa.html?nis=${encodeURIComponent(m.noInduk)}`}
+                          href={getStudentUrl(m.noInduk)}
                           className="text-indigo-600 hover:text-indigo-900 font-bold hover:underline inline-flex items-center gap-1 group"
                           title="Lihat Detail & Rekam Prestasi Siswa"
                         >
