@@ -9,6 +9,8 @@ import {
   Info,
   ChevronRight,
   User,
+  ExternalLink,
+  Share2,
 } from 'lucide-react';
 
 interface BukuIndukModuleProps {
@@ -221,7 +223,14 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
                         {s.nisn}
                       </td>
                       <td className="py-2.5 px-3 font-bold text-indigo-950">
-                        {s.namaLengkap}
+                        <a
+                          href={`siswa.html?id=${s.id}`}
+                          className="text-indigo-600 hover:text-indigo-900 font-bold hover:underline inline-flex items-center gap-1 group"
+                          title="Buka Rekam Jejak & Live School Hall Siswa"
+                        >
+                          <span>{s.namaLengkap}</span>
+                          <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-indigo-600" />
+                        </a>
                       </td>
                       <td className="py-2.5 px-2 text-center">
                         <span
@@ -246,16 +255,26 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
                         </span>
                       </td>
                       <td className="py-2.5 px-3 text-right">
-                        <button
-                          onClick={() => {
-                            setSelectedStudentId(s.id);
-                            setActiveSubTab('lembar_induk');
-                          }}
-                          className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-bold px-2.5 py-1 rounded-lg hover:bg-indigo-50 transition-colors"
-                        >
-                          <span>Buka Lembar</span>
-                          <ChevronRight className="w-3.5 h-3.5" />
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <a
+                            href={`siswa.html?id=${s.id}`}
+                            className="inline-flex items-center gap-1 text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2 py-1 rounded-lg border border-indigo-200 transition-colors"
+                            title="Tampilkan di Layar Aula / Rekam Publik"
+                          >
+                            <Share2 className="w-3 h-3 text-indigo-600" />
+                            <span className="hidden sm:inline">Live Hall</span>
+                          </a>
+                          <button
+                            onClick={() => {
+                              setSelectedStudentId(s.id);
+                              setActiveSubTab('lembar_induk');
+                            }}
+                            className="inline-flex items-center gap-1 text-xs text-slate-700 hover:text-indigo-600 font-bold px-2 py-1 rounded-lg hover:bg-slate-100 transition-colors"
+                          >
+                            <span>Lembar</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

@@ -11,6 +11,7 @@ import {
   Trash2,
   CheckCircle2,
   FileSpreadsheet,
+  ExternalLink,
 } from 'lucide-react';
 
 interface MutasiModuleProps {
@@ -302,7 +303,14 @@ export const MutasiModule: React.FC<MutasiModuleProps> = ({ onOpenAddModal, onOp
                         {m.tanggal}
                       </td>
                       <td className="py-2.5 px-3 font-bold text-slate-900">
-                        {m.namaSiswa}
+                        <a
+                          href={`siswa.html?nama=${encodeURIComponent(m.namaSiswa)}&nis=${m.noInduk}`}
+                          className="text-indigo-600 hover:text-indigo-900 font-bold hover:underline inline-flex items-center gap-1 group"
+                          title="Lihat Detail & Rekam Prestasi Siswa"
+                        >
+                          <span>{m.namaSiswa}</span>
+                          <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-indigo-600" />
+                        </a>
                       </td>
                       <td className="py-2.5 px-2 text-center">
                         <span
@@ -421,7 +429,14 @@ export const MutasiModule: React.FC<MutasiModuleProps> = ({ onOpenAddModal, onOp
                         {m.tanggal}
                       </td>
                       <td className="py-2.5 px-3 font-bold text-slate-900">
-                        {m.namaSiswa}
+                        <a
+                          href={`siswa.html?nama=${encodeURIComponent(m.namaSiswa)}&nis=${m.noInduk}`}
+                          className="text-indigo-600 hover:text-indigo-900 font-bold hover:underline inline-flex items-center gap-1 group"
+                          title="Lihat Detail & Rekam Prestasi Siswa"
+                        >
+                          <span>{m.namaSiswa}</span>
+                          <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-indigo-600" />
+                        </a>
                       </td>
                       <td className="py-2.5 px-2 text-center">
                         <span

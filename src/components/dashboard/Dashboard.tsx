@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Sparkles,
   Calendar,
+  ExternalLink,
 } from 'lucide-react';
 import type { NavTab } from '../common/BottomNav';
 
@@ -378,9 +379,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onOpenAddModal
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <p className="text-xs font-bold text-slate-900 truncate">
-                        {mut.namaSiswa}
-                      </p>
+                      <a
+                        href={`siswa.html?nama=${encodeURIComponent(mut.namaSiswa)}&nis=${mut.noInduk}`}
+                        className="text-xs font-bold text-slate-900 hover:text-indigo-600 hover:underline truncate inline-flex items-center gap-1 group"
+                        title="Buka Rekam Jejak Siswa"
+                      >
+                        <span>{mut.namaSiswa}</span>
+                        <ExternalLink className="w-2.5 h-2.5 text-slate-400 group-hover:text-indigo-600" />
+                      </a>
                       <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-slate-200 text-slate-700">
                         {mut.jenisKelamin === 'L' ? 'Laki-laki' : 'Perempuan'}
                       </span>

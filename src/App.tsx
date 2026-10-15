@@ -48,12 +48,20 @@ const MainAppContent: React.FC = () => {
     );
   }
 
+  const handleNavigate = (tab: NavTab) => {
+    if (tab === 'dashboard') {
+      setCurrentTab('dashboard');
+    } else {
+      window.location.href = `${tab}.html`;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50/80 flex flex-col">
       {/* Top Header */}
       <Header
         onOpenUserModal={() => setIsUserModalOpen(true)}
-        onOpenPrintModal={() => setCurrentTab('cetak-buku')}
+        onOpenPrintModal={() => { window.location.href = 'cetak-buku.html'; }}
         onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
       />
 
@@ -61,7 +69,7 @@ const MainAppContent: React.FC = () => {
         {/* Desktop / Tablet Sidebar */}
         <Sidebar
           currentTab={currentTab}
-          onChangeTab={setCurrentTab}
+          onChangeTab={handleNavigate}
           onOpenUserModal={() => setIsUserModalOpen(true)}
           onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
         />
@@ -70,7 +78,7 @@ const MainAppContent: React.FC = () => {
         <main className="flex-1 min-w-0 p-3.5 sm:p-6 lg:p-8">
           {currentTab === 'dashboard' && (
             <Dashboard
-              onNavigate={setCurrentTab}
+              onNavigate={handleNavigate}
               onOpenAddModal={(type) => handleOpenAddMutation(type)}
             />
           )}
@@ -181,7 +189,7 @@ const MainAppContent: React.FC = () => {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <BottomNav currentTab={currentTab} onChangeTab={setCurrentTab} />
+      <BottomNav currentTab={currentTab} onChangeTab={handleNavigate} />
 
       {/* Modals */}
       <AddMutationModal

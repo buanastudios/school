@@ -87,7 +87,7 @@ export interface SubjectGrade {
 }
 
 export interface Extracurricular {
-  nama: string; // e.g. Pramuka, UKS, Tapak Suci, Tahfidz
+  nama: string; // e.g. Hizbul Wathan/Pramuka, Tapak Suci, Tahfidz
   nilaiGanjil?: string; // Sangat Baik, Baik, etc.
   keteranganGanjil?: string;
   nilaiGenap?: string;
@@ -101,6 +101,35 @@ export interface AttendanceRecord {
   sakitSem2: number;
   izinSem2: number;
   alpaSem2: number;
+}
+
+export interface HistoricalSemesterScore {
+  semesterLabel: string; // e.g. "Kelas 1 Sem 1", "Kelas 1 Sem 2"
+  tahunPelajaran: string;
+  nilaiRataRata: number;
+  kehadiranPersen: number;
+  scores: { [mapelNama: string]: number };
+}
+
+export interface CocurricularProject {
+  id: string;
+  tema: string; // e.g. "Kearifan Lokal", "Gaya Hidup Berkelanjutan", "Kewirausahaan"
+  judulProjek: string;
+  deskripsi: string;
+  dimensi: string[]; // e.g. ["Beriman & Bertakwa", "Gotong Royong", "Kreatif"]
+  capaian: 'Mulai Berkembang' | 'Sedang Berkembang' | 'Berkembang Sesuai Harapan' | 'Sangat Berkembang';
+  keterangan: string;
+}
+
+export interface StudentContribution {
+  id: string;
+  tanggal: string;
+  jenis: 'Prestasi Lomba' | 'Karya / Inovasi' | 'Kepemimpinan' | 'Sosial & Keagamaan' | 'Kontribusi Sekolah';
+  judul: string;
+  tingkat?: 'Sekolah' | 'Kecamatan' | 'Kota' | 'Provinsi' | 'Nasional';
+  penghargaan?: string; // e.g. "Juara 1 Lomba Kaligrafi Pentas PAI", "Ketua Regu HW", "Duta Adiwiyata"
+  deskripsi: string;
+  fotoUrl?: string;
 }
 
 export interface StudentMasterRecord {
@@ -197,6 +226,11 @@ export interface StudentMasterRecord {
     waliKelasNama?: string;
     waliKelasNip?: string;
   };
+
+  // Live Comprehensive Student Profile & School Hall Public Record
+  historicalScores: HistoricalSemesterScore[];
+  cocurriculars: CocurricularProject[];
+  contributions: StudentContribution[];
 }
 
 export interface MonthlyClassRekap {
