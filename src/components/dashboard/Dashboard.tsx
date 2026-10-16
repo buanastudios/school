@@ -85,35 +85,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onOpenAddModal
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md transition-all active:scale-95"
             >
               <UserPlus className="w-4 h-4" />
-              <span>+ Siswa Masuk</span>
+              <span>+ Murid Masuk</span>
             </button>
             <button
               onClick={() => onOpenAddModal('keluar')}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs shadow-md transition-all active:scale-95"
             >
               <UserMinus className="w-4 h-4" />
-              <span>+ Siswa Keluar</span>
+              <span>+ Murid Keluar</span>
             </button>
             <button
               onClick={() => onNavigate('cetak-buku')}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/25 font-semibold text-xs backdrop-blur-sm transition-all"
             >
               <Printer className="w-4 h-4 text-amber-300" />
-              <span>Cetak Buku Mutasi</span>
+              <span>Buku Mutasi</span>
             </button>
             <a
               href="rapor.html"
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs shadow-md transition-all active:scale-95"
             >
               <FileSpreadsheet className="w-4 h-4 text-amber-300" />
-              <span>Rapor Siswa</span>
+              <span>Rapor Murid</span>
             </a>
             <a
               href="kegiatan.html"
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs shadow-md transition-all active:scale-95"
             >
               <Trophy className="w-4 h-4 text-slate-950" />
-              <span>Ekskul & 4 Keahlian Wajib</span>
+              <span>Extra-Curricular & Co-Curricular</span>
             </a>
           </div>
         </div>
@@ -133,7 +133,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onOpenAddModal
             </h3>
           </div>
           <span className="text-xs text-slate-500 font-medium">
-            Oktober 2023 (Sesuai Buku Fisik)
+            {months.find((m) => m.num === selectedMonth)?.name} ({schoolProfile.tahunPelajaran})
           </span>
         </div>
 

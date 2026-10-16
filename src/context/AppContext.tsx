@@ -39,6 +39,20 @@ interface AppContextType {
   updateUser: (id: string, user: Partial<User>) => void;
   deleteUser: (id: string) => void;
 
+  // Enterprise Authentication & Access
+  isAuthenticated: boolean;
+  login: (email: string, password?: string) => { success: boolean; message: string; user?: User };
+  register: (userData: {
+    name: string;
+    email: string;
+    phone?: string;
+    role: UserRole;
+    assignedClass?: number;
+  }) => { success: boolean; message: string; user?: User };
+  logout: () => void;
+  requestPasswordReset: (emailOrPhone: string) => { success: boolean; message: string; resetCode?: string };
+  verifyResetCode: (code: string, newPassword?: string) => { success: boolean; message: string };
+
   mutations: StudentMutation[];
   addMutation: (mutation: Omit<StudentMutation, 'id' | 'createdAt' | 'noUrut'>) => void;
   updateMutation: (id: string, data: Partial<StudentMutation>) => void;
@@ -208,7 +222,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return initialAuditLogs;
   });
 
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    const saved = localStorage.getItem(`${STORAGE_KEY}_is_authenticated`);
+    return saved !== null ? saved === 'true' : true;
+  });
+
   // Save changes to localStorage
+  useEffect(() => {
+    localStorage.setItem(`${STORAGE_KEY}_is_authenticated`, String(isAuthenticated));
+  }, [isAuthenticated]);
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY}_school`, JSON.stringify(schoolProfile));
   }, [schoolProfile]);
@@ -435,6 +457,159 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       'Penghapusan akun pengguna dari basis data sistem.',
       'WARNING'
     );
+  };
+
+  const login = (email: string, _password?: string) => {
+    const trimmed = email.trim().toLowerCase();
+    const found = users.find(
+      (u) =>
+        (u.email && u.email.toLowerCase() === trimmed) ||
+        (u.nip && u.nip.toLowerCase() === trimmed) ||
+        (trimmed === 'admin' && u.role === 'admin')
+    );
+
+    if (!found) {
+      logAuditAction(
+        'SECURITY_ALERT',
+        'Autentikasi Pengguna',
+        `Percobaan login gagal untuk akun/identitas: "${email}". Akun tidak ditemukan.`,
+        'FAILED'
+      );
+      return {
+        success: false,
+        message: 'Email atau NIP tidak ditemukan dalam sistem sekolah. Silakan periksa kembali atau gunakan akun demo.',
+      };
+    }
+
+    if (found.status === 'inactive') {
+      logAuditAction(
+        'SECURITY_ALERT',
+        `Pengguna: ${found.name}`,
+        `Percobaan login ke akun berstatus NONAKTIF (${found.email}) diblokir oleh sistem.`,
+        'FAILED'
+      );
+      return {
+        success: false,
+        message: 'Akun Anda berstatus nonaktif. Silakan hubungi Administrator Sistem Buana School.',
+      };
+    }
+
+    // Success
+    const updatedUser: User = { ...found, lastLogin: new Date().toISOString() };
+    setCurrentUserState(updatedUser);
+    setIsAuthenticated(true);
+    setUsers((prev) => prev.map((u) => (u.id === found.id ? updatedUser : u)));
+
+    logAuditAction(
+      'AUTH_LOGIN',
+      `Pengguna: ${found.name} (${found.role})`,
+      `Pengguna berhasil masuk ke sistem melalui portal autentikasi.`,
+      'SUCCESS'
+    );
+
+    return {
+      success: true,
+      message: `Selamat datang kembali, ${found.name}!`,
+      user: updatedUser,
+    };
+  };
+
+  const register = (userData: {
+    name: string;
+    email: string;
+    phone?: string;
+    role: UserRole;
+    assignedClass?: number;
+  }) => {
+    const trimmedEmail = userData.email.trim().toLowerCase();
+    const existing = users.find((u) => u.email && u.email.toLowerCase() === trimmedEmail);
+
+    if (existing) {
+      return {
+        success: false,
+        message: 'Email tersebut sudah terdaftar dalam sistem Buana School. Silakan gunakan opsi Login.',
+      };
+    }
+
+    const newUser: User = {
+      id: `user-${Date.now()}`,
+      name: userData.name.trim(),
+      email: trimmedEmail,
+      phone: userData.phone?.trim(),
+      role: userData.role,
+      assignedClass: userData.assignedClass,
+      status: 'active',
+      lastLogin: new Date().toISOString(),
+    };
+
+    setUsers((prev) => [...prev, newUser]);
+    setCurrentUserState(newUser);
+    setIsAuthenticated(true);
+
+    logAuditAction(
+      'AUTH_REGISTER',
+      `Pengguna Baru: ${newUser.name} (${newUser.role})`,
+      `Pendaftaran mandiri akun baru berhasil via form Sign Up.`,
+      'SUCCESS'
+    );
+
+    return {
+      success: true,
+      message: 'Akun berhasil didaftarkan dan Anda langsung masuk ke sistem!',
+      user: newUser,
+    };
+  };
+
+  const logout = () => {
+    logAuditAction(
+      'AUTH_LOGOUT',
+      `Pengguna: ${currentUser.name} (${currentUser.role})`,
+      `Pengguna telah keluar dari sesi kerja sistem.`,
+      'SUCCESS'
+    );
+    setIsAuthenticated(false);
+  };
+
+  const requestPasswordReset = (emailOrPhone: string) => {
+    const query = emailOrPhone.trim().toLowerCase();
+    const match = users.find(
+      (u) =>
+        (u.email && u.email.toLowerCase() === query) ||
+        (u.phone && u.phone.replace(/\D/g, '') === query.replace(/\D/g, ''))
+    );
+
+    const targetLabel = match ? `${match.name} (${match.email || match.phone})` : query;
+    logAuditAction(
+      'AUTH_PASSWORD_RESET',
+      `Permintaan Reset Sandi: ${targetLabel}`,
+      `Kode verifikasi pemulihan akses telah diterbitkan (Simulasi OTP: 2026).`,
+      'SUCCESS'
+    );
+
+    return {
+      success: true,
+      message: `Kode verifikasi 4-digit telah disiapkan untuk akun terkait. Gunakan kode 2026 untuk verifikasi.`,
+      resetCode: '2026',
+    };
+  };
+
+  const verifyResetCode = (code: string, _newPassword?: string) => {
+    if (code.trim() === '2026') {
+      logAuditAction(
+        'AUTH_PASSWORD_RESET',
+        `Pengguna: ${currentUser.name}`,
+        'Verifikasi kode OTP pemulihan kata sandi berhasil diselesaikan.',
+        'SUCCESS'
+      );
+      return {
+        success: true,
+        message: 'Kata sandi berhasil diperbarui! Silakan masuk kembali dengan kata sandi baru Anda.',
+      };
+    }
+    return {
+      success: false,
+      message: 'Kode verifikasi yang Anda masukkan tidak cocok. Coba kode demo: 2026.',
+    };
   };
 
   const addMutation = (data: Omit<StudentMutation, 'id' | 'createdAt' | 'noUrut'>) => {
@@ -778,6 +953,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         addUser,
         updateUser,
         deleteUser,
+        isAuthenticated,
+        login,
+        register,
+        logout,
+        requestPasswordReset,
+        verifyResetCode,
         mutations,
         addMutation,
         updateMutation,

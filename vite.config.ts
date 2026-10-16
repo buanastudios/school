@@ -30,11 +30,12 @@ function cleanUrlPlugin(): Plugin {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), cleanUrlPlugin()],
-  base: './', // Essential for GitHub Pages hosting (relative paths)
+  base: './', // Relative base path for robust offline and production hosting
   build: {
     rollupOptions: {
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
+        login: resolve(import.meta.dirname, 'login.html'),
         mutasi: resolve(import.meta.dirname, 'mutasi.html'),
         bukuInduk: resolve(import.meta.dirname, 'buku-induk.html'),
         cetakBuku: resolve(import.meta.dirname, 'cetak-buku.html'),

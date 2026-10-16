@@ -93,7 +93,7 @@ export const MutasiModule: React.FC<MutasiModuleProps> = ({ onOpenAddModal, onOp
               Modul Mutasi
             </span>
             <span className="text-xs text-slate-500 font-medium">
-              Mutasi Siswa Masuk & Keluar
+              Masuk & Keluar
             </span>
           </div>
           <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 mt-1">

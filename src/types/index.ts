@@ -366,6 +366,9 @@ export interface MonthlyRekapitulasi {
 // ==========================================
 export type AuditActionType =
   | 'AUTH_LOGIN'
+  | 'AUTH_LOGOUT'
+  | 'AUTH_REGISTER'
+  | 'AUTH_PASSWORD_RESET'
   | 'AUTH_SWITCH_USER'
   | 'USER_CREATE'
   | 'USER_UPDATE'

@@ -5,6 +5,7 @@ import {
   Database,
   CheckCircle2,
   Users,
+  LogIn,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { renderModuleIcon } from '../../modules/moduleRegistry';
@@ -92,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Main Nav Links (Dynamically rendered from Plug-and-Play Registry) */}
       <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-1.5">
         <div className="px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-          Menu Modul ({visibleModules.length})
+          Menu ({visibleModules.length})
         </div>
         {visibleModules.map((item) => {
           const isActive =
@@ -133,7 +134,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         })}
 
         <div className="pt-5 px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-          Pintasan Cepat
+          Short Cut
         </div>
         <button
           onClick={onOpenUserModal}
@@ -149,6 +150,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <Database className="w-4 h-4 text-slate-500" />
           <span>Identitas & Cadangan JSON</span>
         </button>
+        <a
+          href="login.html"
+          className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl font-medium text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+        >
+          <LogIn className="w-4 h-4 text-slate-500" />
+          <span>Portal Login & Akun</span>
+        </a>
       </div>
 
       {/* Footer Info */}

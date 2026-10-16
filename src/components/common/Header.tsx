@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { School, UserCheck, ChevronDown, Printer } from 'lucide-react';
+import { School, UserCheck, ChevronDown, Printer, LogOut, LogIn } from 'lucide-react';
 import type { User } from '../../types';
 
 interface HeaderProps {
@@ -14,7 +14,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenPrintModal,
   onOpenSettingsModal,
 }) => {
-  const { schoolProfile, currentUser, users, setCurrentUser } = useApp();
+  const { schoolProfile, currentUser, users, setCurrentUser, logout } = useApp();
   const [showQuickSwitch, setShowQuickSwitch] = useState(false);
 
   const getRoleBadge = (user: User) => {
@@ -157,6 +157,26 @@ export const Header: React.FC<HeaderProps> = ({
                       className="text-slate-500 hover:text-slate-700 py-1"
                     >
                       Profil Sekolah
+                    </button>
+                  </div>
+
+                  <div className="pt-2 px-3 border-t border-slate-100 space-y-1">
+                    <a
+                      href="login.html"
+                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+                    >
+                      <LogIn className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Halaman Login & Register</span>
+                    </a>
+                    <button
+                      onClick={() => {
+                        logout();
+                        window.location.href = 'login.html';
+                      }}
+                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors text-left"
+                    >
+                      <LogOut className="w-3.5 h-3.5 text-red-600" />
+                      <span>Keluar (Logout)</span>
                     </button>
                   </div>
                 </div>
