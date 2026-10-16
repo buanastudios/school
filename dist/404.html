@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mengarahkan ke Rekam Jejak Siswa...</title>
+  <script>
+    // GitHub Pages Deep Link Redirect for /siswa/:nis
+    (function() {
+      var path = window.location.pathname;
+      var search = window.location.search;
+      var hash = window.location.hash;
+
+      // Check if path contains /siswa/:nis
+      var match = path.match(/\/siswa\/([a-zA-Z0-9_-]+)/);
+      if (match) {
+        var nis = match[1];
+        var query = search ? search + '&nis=' + encodeURIComponent(nis) : '?nis=' + encodeURIComponent(nis);
+        // Extract base repository path if hosted on github.io (e.g. /buana-school/)
+        var baseIdx = path.indexOf('/siswa/');
+        var basePath = baseIdx >= 0 ? path.substring(0, baseIdx) : '';
+        window.location.replace(basePath + '/siswa.html' + query + hash);
+      } else {
+        // Fallback to home page
+        window.location.replace('./');
+      }
+    })();
+  </script>
+</head>
+<body style="font-family: system-ui, -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f8fafc; color: #475569;">
+  <div style="text-align: center; padding: 20px;">
+    <div style="display: inline-block; width: 36px; height: 36px; border: 3px solid #cbd5e1; border-top-color: #4f46e5; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px;"></div>
+    <h2 style="margin: 0 0 8px; font-size: 16px; color: #1e293b;">Membuka Rekam Jejak Murid...</h2>
+    <p style="margin: 0; font-size: 12px; color: #64748b;">Mengarahkan ke Buku Induk & Analitika Siswa</p>
+  </div>
+  <style>
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</body>
+</html>
