@@ -8,6 +8,7 @@ import type {
   StudentMustHaveSkillRecord,
   Extracurricular,
 } from '../types';
+import { syauqiMasterRecord } from './raporPresets';
 
 export const initialSchoolProfile: SchoolProfile = {
   namaSekolah: 'SD MUHAMMADIYAH 2',
@@ -333,6 +334,9 @@ export const baselineClassCounts = [
 ];
 
 export const initialStudents: StudentMasterRecord[] = [
+  // Syauqi Hafidz Mujahiddin (From Reference Official Rapor Report Card)
+  syauqiMasterRecord,
+
   // From Photo 11 & 15: Arqan Malaeka Haeruman
   {
     id: 'std-1',

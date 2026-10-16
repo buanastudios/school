@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { StudentTimeframeCharts } from './StudentTimeframeCharts';
-import { getStudentUrl, getFullStudentUrl } from '../../utils/routing';
+import { getStudentUrl, getFullStudentUrl, getRaporUrl } from '../../utils/routing';
 import {
   StudentExtracurricularModal,
   StudentMustHaveSkillModal,
@@ -33,6 +33,7 @@ import {
   Palette,
   UtensilsCrossed,
   Swords,
+  Printer,
 } from 'lucide-react';
 
 interface StudentPublicProfileProps {
@@ -222,9 +223,18 @@ export const StudentPublicProfile: React.FC<StudentPublicProfileProps> = ({
             <span>QR Code</span>
           </button>
 
+          <a
+            href={getRaporUrl(student.noInduk)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95"
+            title="Buka / Cetak Rapor Resmi Kurikulum Merdeka"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Rapor Resmi</span>
+          </a>
+
           <button
             onClick={() => setIsHallMode(!isHallMode)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95"
           >
             {isHallMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
             <span>{isHallMode ? 'Mode Standar' : 'Layar Aula (Hall Mode)'}</span>

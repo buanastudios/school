@@ -15,9 +15,18 @@
 
 /* Print Specific Rules */
 @media print {
-  body {
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
     background: #ffffff !important;
     color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   .no-print {
@@ -28,6 +37,12 @@
     display: block !important;
   }
 
+  .rapor-print-container {
+    gap: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
   .print-page {
     page-break-after: always;
     break-after: page;
@@ -35,9 +50,10 @@
     box-shadow: none !important;
     border: none !important;
     margin: 0 !important;
-    padding: 0 !important;
     width: 100% !important;
-    min-height: auto !important;
+    min-height: 297mm !important;
+    height: auto !important;
+    box-sizing: border-box !important;
   }
 
   .print-page:last-child {

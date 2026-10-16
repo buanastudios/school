@@ -77,12 +77,17 @@ export interface PhysicalHealthRecord {
 export interface SubjectGrade {
   mapelId: string;
   mapelNama: string;
-  kategori: 'Agama' | 'Umum' | 'Muatan Lokal';
+  kategori: 'Agama' | 'Umum' | 'Muatan Lokal' | 'Kelompok A' | 'Kelompok B';
+  kelompok?: 'Kelompok A' | 'Kelompok B';
   nilaiGanjil?: number;
   capaianGanjil?: string;
+  capaianTinggiGanjil?: string;
+  capaianPerluPeningkatanGanjil?: string;
   kktpGanjil?: number;
   nilaiGenap?: number;
   capaianGenap?: string;
+  capaianTinggiGenap?: string;
+  capaianPerluPeningkatanGenap?: string;
   kktpGenap?: number;
 }
 
@@ -293,6 +298,27 @@ export interface StudentMasterRecord {
   cocurriculars: CocurricularProject[];
   contributions: StudentContribution[];
   mustHaveSkills?: StudentMustHaveSkillRecord[];
+
+  // Kurikulum Merdeka Official Rapor Fields
+  fase?: string; // e.g. 'A' | 'B' | 'C'
+  statusDalamKeluarga?: string; // e.g. 'Anak Kandung'
+  nomorTeleponRumah?: string;
+  catatanWaliKelasSem1?: string;
+  catatanWaliKelasSem2?: string;
+  kokurikulerSem1?: string;
+  kokurikulerSem2?: string;
+  ekskulSem1?: { nama: string; predikat?: string; keterangan: string }[];
+  ekskulSem2?: { nama: string; predikat?: string; keterangan: string }[];
+  tglRaporSem1?: string;
+  tglRaporSem2?: string;
+  waliKelasNama?: string;
+  waliKelasNuptk?: string;
+  waliKelasNip?: string;
+  waliKelasTtd?: string;
+  kepalaSekolahNama?: string;
+  kepalaSekolahNip?: string;
+  kepalaSekolahTtd?: string;
+  kelulusanStatus?: string; // e.g. 'Lulus' | 'Naik ke Kelas 2'
 }
 
 export interface MonthlyClassRekap {

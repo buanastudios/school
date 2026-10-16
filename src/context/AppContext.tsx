@@ -109,8 +109,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length >= initialStudents.length) {
-          return parsed.map((st: StudentMasterRecord) => ({
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const hasSyauqi = parsed.some((s: StudentMasterRecord) => s.id === 'std-syauqi');
+          const combined = hasSyauqi ? parsed : [initialStudents[0], ...parsed];
+          return combined.map((st: StudentMasterRecord) => ({
             ...st,
             mustHaveSkills:
               st.mustHaveSkills && st.mustHaveSkills.length > 0

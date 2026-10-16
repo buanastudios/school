@@ -7,6 +7,7 @@ import type { NavTab } from './components/common/BottomNav';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { MutasiModule } from './components/mutasi/MutasiModule';
 import { BukuIndukModule } from './components/buku-induk/BukuIndukModule';
+import { RaporModule } from './components/rapor/RaporModule';
 import { BookPrintView } from './components/print/BookPrintView';
 import { AddMutationModal } from './components/mutasi/AddMutationModal';
 import { UserManagementModal } from './components/users/UserManagementModal';
@@ -92,6 +93,10 @@ const MainAppContent: React.FC = () => {
 
           {currentTab === 'buku-induk' && (
             <BukuIndukModule onOpenPrint={() => setCurrentTab('cetak-buku')} />
+          )}
+
+          {currentTab === 'rapor' && (
+            <RaporModule />
           )}
 
           {currentTab === 'pengaturan' && (

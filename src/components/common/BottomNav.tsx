@@ -1,11 +1,12 @@
 import React from 'react';
-import { LayoutDashboard, ArrowLeftRight, BookOpen, Trophy, Printer, Settings } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, BookOpen, Trophy, FileSpreadsheet, Printer } from 'lucide-react';
 
 export type NavTab =
   | 'dashboard'
   | 'mutasi'
   | 'buku-induk'
   | 'kegiatan'
+  | 'rapor'
   | 'cetak-buku'
   | 'pengaturan';
 
@@ -19,9 +20,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChangeTab })
     { id: 'dashboard' as NavTab, label: 'Beranda', icon: LayoutDashboard },
     { id: 'mutasi' as NavTab, label: 'Mutasi', icon: ArrowLeftRight },
     { id: 'buku-induk' as NavTab, label: 'Buku Induk', icon: BookOpen },
+    { id: 'rapor' as NavTab, label: 'Rapor', icon: FileSpreadsheet },
     { id: 'kegiatan' as NavTab, label: 'Ekskul', icon: Trophy },
     { id: 'cetak-buku' as NavTab, label: 'Cetak', icon: Printer },
-    { id: 'pengaturan' as NavTab, label: 'Menu', icon: Settings },
   ];
 
   return (

@@ -29,6 +29,7 @@ const MutasiPage: React.FC = () => {
     if (tab === 'dashboard') window.location.href = 'index.html';
     else if (tab === 'mutasi') window.location.href = 'mutasi.html';
     else if (tab === 'buku-induk') window.location.href = 'buku-induk.html';
+    else if (tab === 'rapor') window.location.href = 'rapor.html';
     else if (tab === 'kegiatan') window.location.href = 'kegiatan.html';
     else if (tab === 'cetak-buku') window.location.href = 'cetak-buku.html';
     else if (tab === 'pengaturan') window.location.href = 'pengaturan.html';

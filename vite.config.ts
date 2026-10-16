@@ -39,6 +39,7 @@ export default defineConfig({
         bukuInduk: resolve(import.meta.dirname, 'buku-induk.html'),
         cetakBuku: resolve(import.meta.dirname, 'cetak-buku.html'),
         kegiatan: resolve(import.meta.dirname, 'kegiatan.html'),
+        rapor: resolve(import.meta.dirname, 'rapor.html'),
         siswa: resolve(import.meta.dirname, 'siswa.html'),
         pengaturan: resolve(import.meta.dirname, 'pengaturan.html'),
       },
