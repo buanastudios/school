@@ -507,15 +507,15 @@ export const RaporPrintView: React.FC<RaporPrintViewProps> = ({
             </div>
           </div>
 
-          {/* Bottom Photo & Principal Signatures */}
+          {/* Bottom Pasfoto & Principal Signatures */}
           <div className="relative z-10 flex items-end justify-between pt-4 font-serif text-[12px] text-black">
-            {/* Pas Foto 3x4 Box */}
+            {/* Pasfoto 3x4 Box */}
             <div className="flex flex-col items-center">
               <div className="w-[30mm] h-[40mm] border border-black border-dashed flex flex-col items-center justify-center text-center p-2 text-[10px] text-slate-500 bg-white">
                 {student.pasFotoUrl ? (
-                  <img src={student.pasFotoUrl} alt="Foto Murid" className="w-full h-full object-cover" />
+                  <img src={student.pasFotoUrl} alt="Pasfoto Murid" className="w-full h-full object-cover" />
                 ) : (
-                  <span>Pas Foto<br />3 x 4 cm</span>
+                  <span>Pasfoto<br />3 x 4 cm</span>
                 )}
               </div>
             </div>

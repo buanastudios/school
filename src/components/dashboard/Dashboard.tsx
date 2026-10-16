@@ -60,7 +60,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onOpenAddModal
           <div className="flex items-center gap-2 mb-2">
             <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full text-indigo-100">
               <Sparkles className="w-3 h-3 text-amber-300" />
-              Sistem Buku Mutasi & Induk Digital
+              Pengelolaan Sekolah Digital
             </span>
             <span className="text-xs text-indigo-200">
               TP {schoolProfile.tahunPelajaran}
@@ -106,7 +106,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onOpenAddModal
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs shadow-md transition-all active:scale-95"
             >
               <FileSpreadsheet className="w-4 h-4 text-amber-300" />
-              <span>Rapor Siswa Merdeka</span>
+              <span>Rapor Siswa</span>
             </a>
             <a
               href="kegiatan.html"

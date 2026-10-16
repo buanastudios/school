@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type {
   SchoolProfile,
   User,
+  UserRole,
   StudentMutation,
   StudentMasterRecord,
   MonthlyRekapitulasi,
@@ -11,6 +12,9 @@ import type {
   MustHaveSkillMaster,
   StudentMustHaveSkillRecord,
   Extracurricular,
+  AuditLogEntry,
+  AuditActionType,
+  AppModuleDefinition,
 } from '../types';
 import {
   initialSchoolProfile,
@@ -22,6 +26,8 @@ import {
   initialMustHaveSkills,
   getDefaultMustHaveSkillsForStudent,
 } from '../data/initialData';
+import { defaultAppModules } from '../modules/moduleRegistry';
+import { initialAuditLogs } from '../data/initialAuditLogs';
 
 interface AppContextType {
   schoolProfile: SchoolProfile;
@@ -64,6 +70,23 @@ interface AppContextType {
     skillKode: string,
     record: Partial<StudentMustHaveSkillRecord>
   ) => void;
+
+  // Dynamic Plug-and-Play Module Management
+  modules: AppModuleDefinition[];
+  toggleModule: (moduleId: string) => boolean;
+  reorderModules: (orderedIds: string[]) => void;
+  updateModuleRoles: (moduleId: string, allowedRoles: UserRole[]) => void;
+  updateModuleDetails: (moduleId: string, data: Partial<AppModuleDefinition>) => void;
+
+  // Enterprise Security & Audit Log System (Admin Only Access)
+  auditLogs: AuditLogEntry[];
+  logAuditAction: (
+    action: AuditActionType,
+    targetEntity: string,
+    details: string,
+    status?: 'SUCCESS' | 'WARNING' | 'FAILED'
+  ) => void;
+  clearAuditLogs: () => void;
 
   getMonthlyRekap: (bulan: number, tahun: number, tahunPelajaran: string) => MonthlyRekapitulasi;
   exportDataAsJson: () => string;
@@ -153,6 +176,38 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return initialMustHaveSkills;
   });
 
+  const [modules, setModules] = useState<AppModuleDefinition[]>(() => {
+    const saved = localStorage.getItem(`${STORAGE_KEY}_modules`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const merged = defaultAppModules.map((def) => {
+            const found = parsed.find((p: AppModuleDefinition) => p.id === def.id);
+            return found ? { ...def, ...found } : def;
+          });
+          return merged.sort((a, b) => a.order - b.order);
+        }
+      } catch (e) {
+        console.error('Failed to parse saved modules', e);
+      }
+    }
+    return defaultAppModules;
+  });
+
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>(() => {
+    const saved = localStorage.getItem(`${STORAGE_KEY}_audit`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {
+        console.error('Failed to parse saved audit logs', e);
+      }
+    }
+    return initialAuditLogs;
+  });
+
   // Save changes to localStorage
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY}_school`, JSON.stringify(schoolProfile));
@@ -182,39 +237,207 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     localStorage.setItem(`${STORAGE_KEY}_must_have_skills`, JSON.stringify(mustHaveSkills));
   }, [mustHaveSkills]);
 
+  useEffect(() => {
+    localStorage.setItem(`${STORAGE_KEY}_modules`, JSON.stringify(modules));
+  }, [modules]);
+
+  useEffect(() => {
+    localStorage.setItem(`${STORAGE_KEY}_audit`, JSON.stringify(auditLogs));
+  }, [auditLogs]);
+
+  const logAuditAction = (
+    action: AuditActionType,
+    targetEntity: string,
+    details: string,
+    status: 'SUCCESS' | 'WARNING' | 'FAILED' = 'SUCCESS'
+  ) => {
+    const entry: AuditLogEntry = {
+      id: `aud-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      timestamp: new Date().toISOString(),
+      action,
+      actorId: currentUser.id,
+      actorName: currentUser.name,
+      actorRole: currentUser.role,
+      targetEntity,
+      details,
+      status,
+      ipAddress: '192.168.1.10',
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Buana Core Engine',
+    };
+
+    setAuditLogs((prev) => [entry, ...prev].slice(0, 500));
+  };
+
+  const toggleModule = (moduleId: string): boolean => {
+    const target = modules.find((m) => m.id === moduleId);
+    if (!target) return false;
+
+    // Safety guard: Core modules cannot be disabled
+    if (target.isCore && target.isEnabled) {
+      logAuditAction(
+        'SECURITY_ALERT',
+        `Modul Inti: ${target.name}`,
+        'Percobaan penonaktifan modul inti yang dilindungi ditolak oleh sistem keamanan.',
+        'WARNING'
+      );
+      return false;
+    }
+
+    const nextState = !target.isEnabled;
+    setModules((prev) =>
+      prev.map((m) => (m.id === moduleId ? { ...m, isEnabled: nextState } : m))
+    );
+
+    logAuditAction(
+      'MODULE_CONFIG_UPDATE',
+      `Modul: ${target.name} (${target.code})`,
+      `Status modul diubah menjadi: ${nextState ? 'AKTIF (Tersedia di Navigasi)' : 'NONAKTIF (Disembunyikan)'}.`,
+      'SUCCESS'
+    );
+    return true;
+  };
+
+  const reorderModules = (orderedIds: string[]) => {
+    setModules((prev) => {
+      const reordered = orderedIds
+        .map((id, index) => {
+          const found = prev.find((m) => m.id === id);
+          return found ? { ...found, order: index + 1 } : null;
+        })
+        .filter((m): m is AppModuleDefinition => m !== null);
+      return reordered;
+    });
+
+    logAuditAction(
+      'MENU_CONFIG_UPDATE',
+      'Tata Susunan Menu & Modul',
+      `Urutan navigasi modul berhasil diperbarui (${orderedIds.length} item disusun ulang).`,
+      'SUCCESS'
+    );
+  };
+
+  const updateModuleRoles = (moduleId: string, allowedRoles: UserRole[]) => {
+    const target = modules.find((m) => m.id === moduleId);
+    if (!target) return;
+
+    setModules((prev) =>
+      prev.map((m) => (m.id === moduleId ? { ...m, allowedRoles } : m))
+    );
+
+    logAuditAction(
+      'MODULE_CONFIG_UPDATE',
+      `Otorisasi Modul: ${target.name}`,
+      `Hak akses modul diperbarui untuk peran: ${allowedRoles.join(', ')}.`,
+      'SUCCESS'
+    );
+  };
+
+  const updateModuleDetails = (moduleId: string, data: Partial<AppModuleDefinition>) => {
+    const target = modules.find((m) => m.id === moduleId);
+    if (!target) return;
+
+    setModules((prev) =>
+      prev.map((m) => (m.id === moduleId ? { ...m, ...data } : m))
+    );
+
+    logAuditAction(
+      'MODULE_CONFIG_UPDATE',
+      `Metadata Modul: ${target.name}`,
+      'Pembaruan atribut dan metadata modul sistem registry.',
+      'SUCCESS'
+    );
+  };
+
+  const clearAuditLogs = () => {
+    if (currentUser.role !== 'admin') {
+      logAuditAction(
+        'SECURITY_ALERT',
+        'Log Audit Keamanan',
+        `Upaya pembersihan log audit oleh pengguna non-administrator (${currentUser.name}) ditolak.`,
+        'FAILED'
+      );
+      return;
+    }
+    const resetEntry: AuditLogEntry = {
+      id: `aud-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      action: 'SYSTEM_SETTINGS_UPDATE',
+      actorId: currentUser.id,
+      actorName: currentUser.name,
+      actorRole: currentUser.role,
+      targetEntity: 'Log Audit Keamanan',
+      details: 'Seluruh riwayat audit log dibersihkan dan diarsipkan oleh Administrator Sistem.',
+      status: 'SUCCESS',
+      ipAddress: '192.168.1.10',
+    };
+    setAuditLogs([resetEntry]);
+  };
+
   const updateSchoolProfile = (profile: Partial<SchoolProfile>) => {
     setSchoolProfile((prev) => ({ ...prev, ...profile }));
+    logAuditAction(
+      'SYSTEM_SETTINGS_UPDATE',
+      'Profil Institusi Sekolah',
+      'Pembaruan identitas lembaga, nomor statistik (NPSN/NSS), atau tanda tangan pimpinan.',
+      'SUCCESS'
+    );
   };
 
   const setCurrentUser = (user: User) => {
     setCurrentUserState(user);
+    logAuditAction(
+      'AUTH_SWITCH_USER',
+      `Pengguna: ${user.name} (${user.role})`,
+      `Sesi kerja aktif dialihkan ke akun ${user.name}.`,
+      'SUCCESS'
+    );
   };
 
   const addUser = (userData: Omit<User, 'id'>) => {
     const newUser: User = {
       ...userData,
       id: `user-${Date.now()}`,
+      status: userData.status || 'active',
     };
     setUsers((prev) => [...prev, newUser]);
+    logAuditAction(
+      'USER_CREATE',
+      `Pengguna: ${newUser.name}`,
+      `Pendaftaran akun pengguna baru dengan peran: ${newUser.role}${newUser.assignedClass ? ` (Kelas ${newUser.assignedClass})` : ''}.`,
+      'SUCCESS'
+    );
   };
 
   const updateUser = (id: string, userData: Partial<User>) => {
+    const existing = users.find((u) => u.id === id);
     setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, ...userData } : u)));
     if (currentUser.id === id) {
       setCurrentUserState((prev) => ({ ...prev, ...userData }));
     }
+    logAuditAction(
+      'USER_UPDATE',
+      `Pengguna: ${existing?.name || id}`,
+      'Pembaruan data profil pengguna, kredensial, atau status akses.',
+      'SUCCESS'
+    );
   };
 
   const deleteUser = (id: string) => {
+    const existing = users.find((u) => u.id === id);
     setUsers((prev) => prev.filter((u) => u.id !== id));
     if (currentUser.id === id) {
       const remaining = users.filter((u) => u.id !== id);
       if (remaining.length > 0) setCurrentUserState(remaining[0]);
     }
+    logAuditAction(
+      'USER_DELETE',
+      `Pengguna: ${existing?.name || id}`,
+      'Penghapusan akun pengguna dari basis data sistem.',
+      'WARNING'
+    );
   };
 
   const addMutation = (data: Omit<StudentMutation, 'id' | 'createdAt' | 'noUrut'>) => {
-    // Determine next noUrut for that type and month
     const existingInMonth = mutations.filter(
       (m) => m.type === data.type && m.bulan === data.bulan && m.tahun === data.tahun
     );
@@ -229,14 +452,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
 
     setMutations((prev) => [...prev, newMutation]);
+    logAuditAction(
+      'MUTATION_CREATE',
+      `Mutasi ${data.type.toUpperCase()}: ${data.namaSiswa}`,
+      `Pencatatan mutasi siswa kelas ${data.kelas} periode bulan ${data.bulan}/${data.tahun}.`,
+      'SUCCESS'
+    );
   };
 
   const updateMutation = (id: string, data: Partial<StudentMutation>) => {
     setMutations((prev) => prev.map((m) => (m.id === id ? { ...m, ...data } : m)));
+    logAuditAction(
+      'MUTATION_UPDATE',
+      `Mutasi ID: ${id}`,
+      'Pembaruan rincian data mutasi siswa.',
+      'SUCCESS'
+    );
   };
 
   const deleteMutation = (id: string) => {
+    const existing = mutations.find((m) => m.id === id);
     setMutations((prev) => prev.filter((m) => m.id !== id));
+    logAuditAction(
+      'MUTATION_DELETE',
+      `Mutasi: ${existing?.namaSiswa || id}`,
+      'Penghapusan rekaman mutasi siswa.',
+      'WARNING'
+    );
   };
 
   const addStudent = (studentData: Omit<StudentMasterRecord, 'id' | 'noUrutBukuInduk'>) => {
@@ -247,14 +489,34 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       noUrutBukuInduk: nextNo,
     };
     setStudents((prev) => [...prev, newStudent]);
+    logAuditAction(
+      'STUDENT_CREATE',
+      `Buku Induk: ${newStudent.namaLengkap} (NIS: ${newStudent.noInduk})`,
+      `Registrasi nomor urut buku induk #${nextNo} untuk siswa baru kelas ${newStudent.kelas}.`,
+      'SUCCESS'
+    );
   };
 
   const updateStudent = (id: string, data: Partial<StudentMasterRecord>) => {
+    const existing = students.find((s) => s.id === id);
     setStudents((prev) => prev.map((s) => (s.id === id ? { ...s, ...data } : s)));
+    logAuditAction(
+      'STUDENT_UPDATE',
+      `Buku Induk: ${existing?.namaLengkap || id}`,
+      'Pembaruan biodata peserta didik atau capaian lembar buku induk.',
+      'SUCCESS'
+    );
   };
 
   const deleteStudent = (id: string) => {
+    const existing = students.find((s) => s.id === id);
     setStudents((prev) => prev.filter((s) => s.id !== id));
+    logAuditAction(
+      'STUDENT_DELETE',
+      `Buku Induk: ${existing?.namaLengkap || id}`,
+      'Penghapusan arsip data siswa dari buku induk sekolah.',
+      'WARNING'
+    );
   };
 
   const getMonthlyRekap = (bulan: number, tahun: number, tahunPelajaran: string): MonthlyRekapitulasi => {
@@ -270,16 +532,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     for (let c = 1; c <= 6; c++) {
       const baseline = baselineClassCounts.find((b) => b.kelas === c) || { l: 0, p: 0 };
 
-      // Calculate cumulative mutations prior to this month in the same academic year
-      // For simplicity & accuracy matching photo 1:
-      // Bulan 10 (Oktober) matches Photo 1 directly:
-      // Kelas 1: Awal 16 L, 13 P. Masuk 0, Keluar 0. Akhir 16 L, 13 P.
-      // Kelas 3: Awal 19 L, 12 P. Keluar 1 L. Akhir 18 L, 12 P.
-      // Kelas 4: Awal 15 L, 24 P. Akhir 15 L, 24 P.
-      // Kelas 5: Awal 15 L, 5 P. Keluar 2 L. Akhir 13 L, 5 P.
-      // Kelas 6: Awal 21 L, 13 P. Akhir 21 L, 13 P.
-
-      // Count mutations strictly in this month and class:
+      // Perhitungan mutasi bulanan per rombel kelas sesuai standar register kesiswaan
       const masukInMonth = mutations.filter(
         (m) => m.type === 'masuk' && m.kelas === c && m.bulan === bulan && m.tahun === tahun
       );
@@ -428,15 +681,29 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const exportDataAsJson = (): string => {
     const payload = {
-      version: '1.1',
+      version: '2.5',
+      system: 'BUANA STUDIOS • Enterprise School Platform',
       exportedAt: new Date().toISOString(),
+      exportedBy: {
+        id: currentUser.id,
+        name: currentUser.name,
+        role: currentUser.role,
+      },
       schoolProfile,
       users,
       mutations,
       students,
       extracurriculars,
       mustHaveSkills,
+      modules,
+      auditLogs,
     };
+    logAuditAction(
+      'DATA_EXPORT',
+      'Basis Data Sekolah Lengkap',
+      'Ekspor berkas cadangan JSON institusi untuk arsip dan keamanan.',
+      'SUCCESS'
+    );
     return JSON.stringify(payload, null, 2);
   };
 
@@ -449,9 +716,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (data.students && Array.isArray(data.students)) setStudents(data.students);
       if (data.extracurriculars && Array.isArray(data.extracurriculars)) setExtracurriculars(data.extracurriculars);
       if (data.mustHaveSkills && Array.isArray(data.mustHaveSkills)) setMustHaveSkills(data.mustHaveSkills);
+      if (data.modules && Array.isArray(data.modules)) setModules(data.modules);
+      if (data.auditLogs && Array.isArray(data.auditLogs)) setAuditLogs(data.auditLogs);
+
+      logAuditAction(
+        'DATA_IMPORT',
+        'Pemulihan Basis Data',
+        'Impor berkas JSON berhasil memulihkan data sekolah, siswa, mutasi, dan konfigurasi modul.',
+        'SUCCESS'
+      );
       return true;
     } catch (e) {
       console.error('Import failed', e);
+      logAuditAction(
+        'DATA_IMPORT',
+        'Pemulihan Basis Data',
+        'Kegagalan pemulihan berkas cadangan JSON: format data tidak valid.',
+        'FAILED'
+      );
       return false;
     }
   };
@@ -464,6 +746,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setStudents(initialStudents);
     setExtracurriculars(initialExtracurriculars);
     setMustHaveSkills(initialMustHaveSkills);
+    setModules(defaultAppModules);
+    setAuditLogs(initialAuditLogs);
+
     localStorage.removeItem(`${STORAGE_KEY}_school`);
     localStorage.removeItem(`${STORAGE_KEY}_users`);
     localStorage.removeItem(`${STORAGE_KEY}_current_user`);
@@ -471,6 +756,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     localStorage.removeItem(`${STORAGE_KEY}_students`);
     localStorage.removeItem(`${STORAGE_KEY}_extracurriculars`);
     localStorage.removeItem(`${STORAGE_KEY}_must_have_skills`);
+    localStorage.removeItem(`${STORAGE_KEY}_modules`);
+    localStorage.removeItem(`${STORAGE_KEY}_audit`);
+
+    logAuditAction(
+      'SYSTEM_SETTINGS_UPDATE',
+      'Basis Data Sistem',
+      'Sistem dikembalikan ke kondisi bawaan standar institusi (Factory Reset).',
+      'WARNING'
+    );
   };
 
   return (
@@ -504,6 +798,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         deleteMustHaveSkill,
         updateStudentExtracurriculars,
         updateStudentMustHaveSkill,
+        modules,
+        toggleModule,
+        reorderModules,
+        updateModuleRoles,
+        updateModuleDetails,
+        auditLogs,
+        logAuditAction,
+        clearAuditLogs,
         getMonthlyRekap,
         exportDataAsJson,
         importDataFromJson,

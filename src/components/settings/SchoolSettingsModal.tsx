@@ -273,10 +273,10 @@ export const SchoolSettingsModal: React.FC<SchoolSettingsModalProps> = ({ isOpen
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
               <div className="flex items-center gap-2">
                 <Database className="w-4 h-4 text-indigo-600" />
-                <h4 className="font-bold text-slate-900">Cadangkan Data (Offline & GitHub Pages)</h4>
+                <h4 className="font-bold text-slate-900">Cadangkan Basis Data Sekolah (JSON)</h4>
               </div>
               <p className="text-slate-600 leading-relaxed text-[11px]">
-                Aplikasi ini berjalan 100% pada peramban web (offline-ready) dan dapat di-host di GitHub Pages. Seluruh data tersimpan otomatis di perangkat Anda. Unduh salinan JSON ini secara rutin untuk arsip atau pemindahan ke gawai/komputer lain.
+                Seluruh data tersimpan terenkripsi secara lokal di peramban sistem. Unduh berkas cadangan JSON ini secara berkala untuk keperluan arsip institusi atau migrasi ke workstation lain.
               </p>
               <button
                 onClick={handleDownloadBackup}

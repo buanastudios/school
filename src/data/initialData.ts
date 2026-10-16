@@ -29,12 +29,32 @@ export const initialSchoolProfile: SchoolProfile = {
 
 export const initialUsers: User[] = [
   {
+    id: 'user-admin',
+    name: 'Administrator Sistem (Buana Studios)',
+    role: 'admin',
+    nip: 'ADMIN-BUANA-01',
+    email: 'admin@buanastudios.com',
+    phone: '081234567890',
+    status: 'active',
+  },
+  {
     id: 'user-ks',
     name: 'Tete Rohaeni, S.Pd., M.M.',
     role: 'kepala_sekolah',
     nip: '196805121991032004',
     email: 'kepsek@sdmuhammadiyah2bdg.sch.id',
     signatureUrl: initialSchoolProfile.kepalaSekolahTtd,
+    status: 'active',
+  },
+  {
+    id: 'user-wk6',
+    name: 'Syamsul Bahri, S.Pd.I., Gr.',
+    role: 'wali_kelas',
+    assignedClass: 6,
+    nip: '7035768669130423',
+    nuptk: '7035768669130423',
+    email: 'syamsul.bahri@sdmuhammadiyah2bdg.sch.id',
+    status: 'active',
   },
   {
     id: 'user-wk1',
@@ -43,6 +63,7 @@ export const initialUsers: User[] = [
     assignedClass: 1,
     nip: '197508202005012003',
     email: 'walikelas1@sdmuhammadiyah2bdg.sch.id',
+    status: 'active',
   },
   {
     id: 'user-wk2',
@@ -51,6 +72,7 @@ export const initialUsers: User[] = [
     assignedClass: 2,
     nip: '198203152009022005',
     email: 'walikelas2@sdmuhammadiyah2bdg.sch.id',
+    status: 'active',
   },
   {
     id: 'user-wk3',
@@ -59,6 +81,7 @@ export const initialUsers: User[] = [
     assignedClass: 3,
     nip: '198801102014031002',
     email: 'walikelas3@sdmuhammadiyah2bdg.sch.id',
+    status: 'active',
   },
   {
     id: 'user-wk4',
@@ -67,6 +90,7 @@ export const initialUsers: User[] = [
     assignedClass: 4,
     nip: '198506122010012011',
     email: 'walikelas4@sdmuhammadiyah2bdg.sch.id',
+    status: 'active',
   },
   {
     id: 'user-wk5',
@@ -75,14 +99,7 @@ export const initialUsers: User[] = [
     assignedClass: 5,
     nip: '196911041994121001',
     email: 'walikelas5@sdmuhammadiyah2bdg.sch.id',
-  },
-  {
-    id: 'user-wk6',
-    name: 'Rina Marlina, S.Pd.',
-    role: 'wali_kelas',
-    assignedClass: 6,
-    nip: '198304192008012014',
-    email: 'walikelas6@sdmuhammadiyah2bdg.sch.id',
+    status: 'active',
   },
   {
     id: 'user-tu',
@@ -90,11 +107,12 @@ export const initialUsers: User[] = [
     role: 'tata_usaha',
     nip: '199207012020121004',
     email: 'tu@sdmuhammadiyah2bdg.sch.id',
+    status: 'active',
   },
 ];
 
 export const initialMutations: StudentMutation[] = [
-  // Mutasi Keluar - Oktober 2023 (From Photo 1)
+  // Registrasi Mutasi Siswa Keluar
   {
     id: 'mut-out-1',
     type: 'keluar',
@@ -147,7 +165,7 @@ export const initialMutations: StudentMutation[] = [
     createdAt: '2023-10-05T10:00:00Z',
   },
 
-  // Mutasi Masuk - Juli 2023 (From Photo 5)
+  // Registrasi Mutasi Siswa Masuk
   {
     id: 'mut-in-1',
     type: 'masuk',
@@ -322,8 +340,7 @@ export const initialMutations: StudentMutation[] = [
   },
 ];
 
-// Baseline Student Counts per Class for Academic Year 2023-2024
-// (Calibrated with Photo 1 Rekapitulasi)
+// Baseline Student Demographics per Class
 export const baselineClassCounts = [
   { kelas: 1, l: 16, p: 13 },
   { kelas: 2, l: 16, p: 13 },
@@ -334,10 +351,10 @@ export const baselineClassCounts = [
 ];
 
 export const initialStudents: StudentMasterRecord[] = [
-  // Syauqi Hafidz Mujahiddin (From Reference Official Rapor Report Card)
+  // Syauqi Hafidz Mujahiddin - Kelas 6A
   syauqiMasterRecord,
 
-  // From Photo 11 & 15: Arqan Malaeka Haeruman
+  // Arqan Malaeka Haeruman - Kelas 1
   {
     id: 'std-1',
     noUrutBukuInduk: 1,
@@ -594,7 +611,7 @@ export const initialStudents: StudentMasterRecord[] = [
     ],
   },
 
-  // From Photo 11 & 13: Adzkia Batari Safitri
+  // Siswa 2: Adzkia Batari Safitri
   {
     id: 'std-2',
     noUrutBukuInduk: 2,
@@ -655,7 +672,7 @@ export const initialStudents: StudentMasterRecord[] = [
         gigi: 'Baik',
       },
     ],
-    // Matching exact grades from Photo 13!
+    // Capaian Pembelajaran Kurikulum Merdeka (Rapor Lembar IV)
     grades: [
       {
         mapelId: 'm-agama',

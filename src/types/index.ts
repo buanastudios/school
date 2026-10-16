@@ -6,8 +6,12 @@ export interface User {
   role: UserRole;
   assignedClass?: number; // 1-6 for homeroom teachers
   nip?: string;
+  nuptk?: string;
   signatureUrl?: string; // Data URL or SVG string
   email?: string;
+  phone?: string;
+  status?: 'active' | 'inactive';
+  lastLogin?: string;
 }
 
 export interface SchoolProfile {
@@ -356,3 +360,65 @@ export interface MonthlyRekapitulasi {
   totalAkhirP: number;
   totalAkhir: number;
 }
+
+// ==========================================
+// AUDIT LOG & ENTERPRISE SECURITY
+// ==========================================
+export type AuditActionType =
+  | 'AUTH_LOGIN'
+  | 'AUTH_SWITCH_USER'
+  | 'USER_CREATE'
+  | 'USER_UPDATE'
+  | 'USER_DELETE'
+  | 'STUDENT_CREATE'
+  | 'STUDENT_UPDATE'
+  | 'STUDENT_DELETE'
+  | 'GRADE_UPDATE'
+  | 'RAPOR_GENERATE'
+  | 'RAPOR_PRINT'
+  | 'MUTATION_CREATE'
+  | 'MUTATION_UPDATE'
+  | 'MUTATION_DELETE'
+  | 'ACTIVITY_UPDATE'
+  | 'MODULE_CONFIG_UPDATE'
+  | 'MENU_CONFIG_UPDATE'
+  | 'SYSTEM_SETTINGS_UPDATE'
+  | 'DATA_EXPORT'
+  | 'DATA_IMPORT'
+  | 'SECURITY_ALERT';
+
+export interface AuditLogEntry {
+  id: string;
+  timestamp: string; // ISO 8601
+  action: AuditActionType;
+  actorId: string;
+  actorName: string;
+  actorRole: UserRole;
+  targetEntity: string;
+  details: string;
+  status: 'SUCCESS' | 'WARNING' | 'FAILED';
+  ipAddress?: string;
+  userAgent?: string;
+}
+
+// ==========================================
+// DYNAMIC MODULE & MENU MANAGEMENT (PLUG-AND-PLAY)
+// ==========================================
+export interface AppModuleDefinition {
+  id: string; // e.g. 'dashboard', 'mutasi', 'buku-induk', 'rapor', 'kegiatan', 'cetak-buku', 'users', 'audit-log', 'modules', 'pengaturan'
+  code: string;
+  name: string;
+  label: string;
+  description: string;
+  iconName: string; // Lucide icon identifier
+  path: string; // Target page route (e.g. 'index.html', 'rapor.html')
+  category: 'Utama' | 'Kesiswaan' | 'Akademik' | 'Administrasi' | 'Sistem & Keamanan';
+  allowedRoles: UserRole[];
+  isEnabled: boolean;
+  order: number;
+  badge?: string;
+  version: string;
+  isCore?: boolean; // Cannot be disabled if core
+  author?: string;
+}
+

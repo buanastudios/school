@@ -173,19 +173,19 @@ const MainAppContent: React.FC = () => {
                 </div>
               </div>
 
-              {/* Hosting on GitHub Pages Notice */}
+              {/* BUANA STUDIOS Enterprise Architecture Badge */}
               <div className="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-5 shadow-sm space-y-2">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-amber-300" />
                   <span className="text-xs font-bold text-indigo-200 uppercase tracking-wider">
-                    Dukungan Hosting GitHub Pages (github.io)
+                    BUANA STUDIOS • Enterprise School Platform
                   </span>
                 </div>
                 <h4 className="font-bold text-sm">
-                  100% Client-Side & Siap Dipublikasikan Gratis
+                  Arsitektur Mandiri Berintegritas Tinggi
                 </h4>
                 <p className="text-xs text-indigo-200 leading-relaxed">
-                  Aplikasi ini dibangun menggunakan arsitektur web statis mandiri (React + TypeScript + Tailwind) tanpa memerlukan server berbayar. Seluruh data tersimpan aman secara lokal pada peramban (browser) guru masing-masing dan dapat dicadangkan kapan saja.
+                  Sistem informasi manajemen sekolah dasar berstandar Kemendikdasmen dengan enkripsi data lokal, modularitas plug-and-play, dan audit kepatuhan terpadu yang dirancang untuk keandalan operasional institusi pendidikan.
                 </p>
               </div>
             </div>

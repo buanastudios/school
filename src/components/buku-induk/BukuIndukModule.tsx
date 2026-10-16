@@ -141,7 +141,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
       </div>
 
       {/* ======================================================== */}
-      {/* TAB 1: NOMOR URUT PESERTA DIDIK (Matching Photo 9)      */}
+      {/* TAB 1: NOMOR URUT PESERTA DIDIK                           */}
       {/* ======================================================== */}
       {activeSubTab === 'daftar' && (
         <div className="space-y-3">
@@ -181,7 +181,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
             </div>
           </div>
 
-          {/* Table matching Photo 9 */}
+          {/* Table Register Peserta Didik */}
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
             <div className="p-4 border-b border-slate-100 flex items-center justify-between">
               <div>
@@ -296,7 +296,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
       )}
 
       {/* ======================================================== */}
-      {/* TAB 2: LEMBAR BUKU INDUK SISWA (Photos 11, 12, 15)      */}
+      {/* TAB 2: LEMBAR BUKU INDUK SISWA                            */}
       {/* ======================================================== */}
       {activeSubTab === 'lembar_induk' && selectedStudent && (
         <div className="space-y-4">
@@ -326,7 +326,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
             </button>
           </div>
 
-          {/* Individual Dossier Paper matching Photos 11 & 15 */}
+          {/* Individual Dossier Paper */}
           <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-10 shadow-sm max-w-4xl mx-auto space-y-6 font-sans">
             {/* Dossier Header */}
             <div className="border-b-2 border-black pb-3 flex justify-between items-start">
@@ -354,7 +354,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
               </div>
             </div>
 
-            {/* Layout: Main Details + Photo Column */}
+            {/* Layout: Main Details + Pasfoto Column */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               {/* Left 3 cols: Info Sections A, B, C */}
               <div className="md:col-span-3 space-y-5 text-xs">
@@ -476,7 +476,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
                   </div>
                 </div>
 
-                {/* F. FISIK & KESEHATAN (Matching Photo 12) */}
+                {/* F. FISIK & KESEHATAN */}
                 <div className="space-y-2 pt-2">
                   <h4 className="font-black text-slate-900 border-b border-slate-300 pb-1 uppercase tracking-wider">
                     F. CATATAN KESEHATAN & FISIK
@@ -510,26 +510,26 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
                 </div>
               </div>
 
-              {/* Right 1 col: Pas Foto Boxes (Matching Photo 11 & 15) */}
+              {/* Right 1 col: Pasfoto Siswa & Tanda Tangan */}
               <div className="space-y-4">
                 <div className="border border-slate-300 rounded-xl p-3 text-center bg-slate-50">
                   <div className="w-28 h-36 mx-auto border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center bg-white overflow-hidden shadow-2xs">
                     {selectedStudent.pasFotoUrl ? (
                       <img
                         src={selectedStudent.pasFotoUrl}
-                        alt="Pas Foto Siswa"
+                        alt="Pasfoto Siswa"
                         className="w-full h-full object-cover"
                       />
                     ) : (
                       <div className="text-center p-2 text-slate-400">
                         <User className="w-8 h-8 mx-auto mb-1 text-slate-300" />
-                        <span className="text-[10px] font-bold block">Pas Photo</span>
+                        <span className="text-[10px] font-bold block">Pasfoto</span>
                         <span className="text-[9px]">3 x 4</span>
                       </div>
                     )}
                   </div>
                   <p className="text-[9px] text-slate-400 mt-2 font-medium">
-                    Cap tiga jari tengah kiri mengenai pas photo bagian bawah
+                    Cap tiga jari tengah kiri mengenai pasfoto bagian bawah
                   </p>
                 </div>
 
@@ -548,7 +548,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
       )}
 
       {/* ======================================================== */}
-      {/* TAB 3: RAPOR CAPAIAN MERDEKA (Matching Photo 13)        */}
+      {/* TAB 3: RAPOR CAPAIAN MERDEKA                              */}
       {/* ======================================================== */}
       {activeSubTab === 'rapor' && selectedStudent && (
         <div className="space-y-4">
@@ -673,7 +673,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
               </table>
             </div>
 
-            {/* Bottom Decision & Signatures matching Photo 13 */}
+            {/* Bottom Decision & Signatures */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-200 text-xs">
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
                 <span className="font-bold text-slate-800 uppercase block">KETIDAKHADIRAN</span>
@@ -700,7 +700,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
                 </div>
               </div>
 
-              {/* Signatures from Photo 13 */}
+              {/* Signatures */}
               <div className="flex justify-between items-end p-2 text-right">
                 <div className="text-left">
                   <p className="text-[11px] font-bold text-slate-700">Mengetahui,</p>
@@ -730,7 +730,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
       )}
 
       {/* ======================================================== */}
-      {/* TAB 4: LEMBAR PEMERIKSAAN BUKU INDUK (Photo 8)          */}
+      {/* TAB 4: LEMBAR PEMERIKSAAN BUKU INDUK                     */}
       {/* ======================================================== */}
       {activeSubTab === 'pemeriksaan' && (
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs max-w-4xl mx-auto space-y-4">
@@ -776,7 +776,7 @@ export const BukuIndukModule: React.FC<BukuIndukModuleProps> = ({ onOpenPrint })
       )}
 
       {/* ======================================================== */}
-      {/* TAB 5: PETUNJUK PENGISIAN (Photo 10)                     */}
+      {/* TAB 5: PETUNJUK PENGISIAN                                */}
       {/* ======================================================== */}
       {activeSubTab === 'petunjuk' && (
         <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs max-w-4xl mx-auto space-y-4 font-sans text-xs text-slate-800 leading-relaxed">

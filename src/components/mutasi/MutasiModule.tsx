@@ -90,17 +90,17 @@ export const MutasiModule: React.FC<MutasiModuleProps> = ({ onOpenAddModal, onOp
         <div>
           <div className="flex items-center gap-2">
             <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-700 font-bold text-xs">
-              Modul Resmi
+              Modul Mutasi
             </span>
             <span className="text-xs text-slate-500 font-medium">
-              Buku Mutasi Siswa Masuk & Keluar
+              Mutasi Siswa Masuk & Keluar
             </span>
           </div>
           <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 mt-1">
-            Buku Mutasi Murid (Siswa / I)
+            Mutasi Murid
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Format resmi sesuai standar Departemen Pendidikan Nasional & Kemendikbudristek
+            Format resmi disesuaikan dengan standar Departemen Pendidikan Nasional & Kemendikbudristek
           </p>
         </div>
 
@@ -111,21 +111,21 @@ export const MutasiModule: React.FC<MutasiModuleProps> = ({ onOpenAddModal, onOp
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-all active:scale-95"
           >
             <UserPlus className="w-4 h-4" />
-            <span>+ Murid Masuk</span>
+            <span>+ Masuk</span>
           </button>
           <button
             onClick={() => onOpenAddModal('keluar')}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition-all active:scale-95"
           >
             <UserMinus className="w-4 h-4" />
-            <span>+ Murid Keluar</span>
+            <span>+ Keluar</span>
           </button>
           <button
             onClick={onOpenPrint}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs transition-colors"
           >
             <Printer className="w-4 h-4 text-indigo-600" />
-            <span>Cetak Buku Mutasi</span>
+            <span>Cetak Buku</span>
           </button>
         </div>
       </div>
@@ -194,7 +194,7 @@ export const MutasiModule: React.FC<MutasiModuleProps> = ({ onOpenAddModal, onOp
             {/* Class Filter */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
               <span className="text-xs font-bold text-slate-500 whitespace-nowrap hidden sm:inline">
-                Kelas:
+                Grade:
               </span>
               <button
                 onClick={() => setFilterClass('all')}
@@ -204,7 +204,7 @@ export const MutasiModule: React.FC<MutasiModuleProps> = ({ onOpenAddModal, onOp
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
-                Semua
+                All
               </button>
               {[1, 2, 3, 4, 5, 6].map((k) => (
                 <button
@@ -216,7 +216,7 @@ export const MutasiModule: React.FC<MutasiModuleProps> = ({ onOpenAddModal, onOp
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
-                  Kls {k}
+                  {/*Grade*/} {k}
                 </button>
               ))}
             </div>
@@ -492,7 +492,7 @@ export const MutasiModule: React.FC<MutasiModuleProps> = ({ onOpenAddModal, onOp
         </div>
       )}
 
-      {/* Tab Content: REKAPITULASI (Matches Photo 1 bottom) */}
+      {/* Tab Content: REKAPITULASI */}
       {activeTab === 'rekap' && (
         <div className="space-y-4">
           <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs">
@@ -641,7 +641,7 @@ export const MutasiModule: React.FC<MutasiModuleProps> = ({ onOpenAddModal, onOp
               </table>
             </div>
 
-            {/* Signature Block Preview matching Photo 2 & 13 */}
+            {/* Signature Block Preview */}
             <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
               <div className="flex items-center gap-2 text-xs text-slate-600">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />

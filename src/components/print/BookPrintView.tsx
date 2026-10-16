@@ -178,7 +178,7 @@ export const BookPrintView: React.FC<BookPrintViewProps> = ({ onBack }) => {
         {/* ===================================================== */}
         {includeCover && (
           <div className="print-page bg-white p-8 sm:p-14 border border-slate-300 shadow-md max-w-4xl mx-auto min-h-[900px] flex flex-col justify-between relative">
-            {/* Top Right School Identification Boxes (Matching Photo 4) */}
+            {/* Top Right School Identification Boxes */}
             <div className="flex justify-end text-[11px]">
               <div className="space-y-1 font-sans">
                 <div className="flex items-center justify-between gap-2">
@@ -233,7 +233,7 @@ export const BookPrintView: React.FC<BookPrintViewProps> = ({ onBack }) => {
                 )}
               </div>
 
-              {/* School Info Box (Matches Photo 4) */}
+              {/* School Info Box */}
               <div className="max-w-xl mx-auto border-2 border-black rounded-2xl p-6 sm:p-8 text-left space-y-3 font-sans shadow-xs mt-8">
                 <div className="grid grid-cols-12 gap-1 text-sm">
                   <span className="col-span-4 font-bold text-black uppercase">NAMA SEKOLAH</span>
@@ -295,7 +295,7 @@ export const BookPrintView: React.FC<BookPrintViewProps> = ({ onBack }) => {
         )}
 
         {/* ===================================================== */}
-        {/* 2. PETUNJUK & IDENTITAS (Matching Photo 3)            */}
+        {/* 2. PETUNJUK & IDENTITAS                               */}
         {/* ===================================================== */}
         {includeIntro && (
           <div className="print-page bg-white p-8 sm:p-14 border border-slate-300 shadow-md max-w-4xl mx-auto min-h-[900px] flex flex-col justify-between">
@@ -304,7 +304,7 @@ export const BookPrintView: React.FC<BookPrintViewProps> = ({ onBack }) => {
                 MUTASI MURID ( SISWA / I ) MASUK DAN KELUAR
               </h2>
 
-              {/* Box with official text from Photo 3 */}
+              {/* Box with official text */}
               <div className="border-2 border-black rounded-xl p-8 max-w-2xl mx-auto space-y-4 text-justify font-serif text-sm leading-relaxed">
                 <p className="indent-8">
                   Format Buku Mutasi cukup mudah dimengerti dan tidak perlu kiranya penjelasan khusus.
@@ -339,7 +339,7 @@ export const BookPrintView: React.FC<BookPrintViewProps> = ({ onBack }) => {
               </div>
             </div>
 
-            {/* Bottom School Details Box from Photo 3 */}
+            {/* Bottom School Details Box */}
             <div className="border border-black rounded-xl p-5 max-w-2xl mx-auto w-full font-sans text-xs space-y-2 mt-8">
               <div className="grid grid-cols-12 gap-1">
                 <span className="col-span-4 font-bold">NAMA SEKOLAH</span>
@@ -361,7 +361,7 @@ export const BookPrintView: React.FC<BookPrintViewProps> = ({ onBack }) => {
         )}
 
         {/* ===================================================== */}
-        {/* 3. MONTHLY SPREAD PAGES (Matching Photo 1 & Photo 2)  */}
+        {/* 3. MONTHLY SPREAD PAGES                               */}
         {/* ===================================================== */}
         {activeMonths.map((mInfo) => {
           const keluarList = mutations.filter(
@@ -376,7 +376,6 @@ export const BookPrintView: React.FC<BookPrintViewProps> = ({ onBack }) => {
             <React.Fragment key={`${mInfo.year}-${mInfo.num}`}>
               {/* -------------------------------------------------- */}
               {/* HALAMAN KIRI: MUTASI KELUAR & TABEL REKAPITULASI   */}
-              {/* (Matching Photo 1 exact layout)                    */}
               {/* -------------------------------------------------- */}
               <div className="print-page bg-white p-6 sm:p-10 border border-slate-300 shadow-md max-w-6xl mx-auto min-h-[850px] flex flex-col justify-between">
                 <div>
@@ -440,7 +439,7 @@ export const BookPrintView: React.FC<BookPrintViewProps> = ({ onBack }) => {
                   </table>
                 </div>
 
-                {/* Bottom REKAPITULASI Table (Matching Photo 1 bottom) */}
+                {/* Bottom REKAPITULASI Table */}
                 <div className="mt-4 pt-2 font-sans">
                   <div className="text-[10px] font-black uppercase text-center tracking-widest pb-1">
                     REKAPITULASI
@@ -522,7 +521,7 @@ export const BookPrintView: React.FC<BookPrintViewProps> = ({ onBack }) => {
 
               {/* -------------------------------------------------- */}
               {/* HALAMAN KANAN: MUTASI MASUK & PENGESAHAN KEPALA    */}
-              {/* SEKOLAH (Matching Photo 2 & Photo 5 exact layout) */}
+              {/* SEKOLAH                                            */}
               {/* -------------------------------------------------- */}
               <div className="print-page bg-white p-6 sm:p-10 border border-slate-300 shadow-md max-w-6xl mx-auto min-h-[850px] flex flex-col justify-between">
                 <div>
@@ -599,7 +598,7 @@ export const BookPrintView: React.FC<BookPrintViewProps> = ({ onBack }) => {
                   </table>
                 </div>
 
-                {/* Bottom Signature Section (Matching Photo 2 exactly) */}
+                {/* Bottom Signature Section */}
                 <div className="mt-8 pt-4 font-sans flex justify-between items-end">
                   <div className="text-[10px] text-slate-500 italic">
                     Dicetak resmi secara digital melalui Sistem Sekolah • {schoolProfile.namaSekolah}

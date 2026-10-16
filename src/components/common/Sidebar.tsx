@@ -1,19 +1,13 @@
 import React from 'react';
 import type { NavTab } from './BottomNav';
 import {
-  LayoutDashboard,
-  ArrowLeftRight,
-  BookOpen,
-  Trophy,
-  FileSpreadsheet,
-  Printer,
-  Settings,
-  Users,
   School,
   Database,
   CheckCircle2,
+  Users,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { renderModuleIcon } from '../../modules/moduleRegistry';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -28,51 +22,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenUserModal,
   onOpenSettingsModal,
 }) => {
-  const { schoolProfile, currentUser } = useApp();
+  const { schoolProfile, currentUser, modules } = useApp();
 
-  const mainNav = [
-    {
-      id: 'dashboard' as NavTab,
-      label: 'Beranda & Statistik',
-      icon: LayoutDashboard,
-      badge: 'Utama',
-    },
-    {
-      id: 'mutasi' as NavTab,
-      label: 'Buku Mutasi Siswa',
-      icon: ArrowLeftRight,
-      badge: 'Masuk & Keluar',
-    },
-    {
-      id: 'buku-induk' as NavTab,
-      label: 'Buku Induk Register',
-      icon: BookOpen,
-      badge: 'Kurikulum Merdeka',
-    },
-    {
-      id: 'rapor' as NavTab,
-      label: 'Rapor Siswa Merdeka',
-      icon: FileSpreadsheet,
-      badge: 'Input & Cetak',
-    },
-    {
-      id: 'kegiatan' as NavTab,
-      label: 'Ekstra & Kokurikuler',
-      icon: Trophy,
-      badge: 'Bakat & Keahlian',
-    },
-    {
-      id: 'cetak-buku' as NavTab,
-      label: 'Cetak Buku On-Demand',
-      icon: Printer,
-      badge: 'Format Resmi',
-    },
-    {
-      id: 'pengaturan' as NavTab,
-      label: 'Pengaturan & Backup',
-      icon: Settings,
-    },
-  ];
+  // Dynamic Plug-and-Play Modules filtered by status and active user's role
+  const visibleModules = modules
+    .filter((m) => m.isEnabled && m.allowedRoles.includes(currentUser.role))
+    .sort((a, b) => a.order - b.order);
+
+  const handleModuleClick = (m: (typeof visibleModules)[0]) => {
+    // If target has path containing .html and current page is not that, navigate
+    if (m.path.includes('?')) {
+      window.location.href = m.path;
+    } else if (m.id === 'dashboard') {
+      onChangeTab('dashboard');
+    } else {
+      onChangeTab(m.id as NavTab);
+    }
+  };
 
   return (
     <aside className="hidden md:flex flex-col w-64 lg:w-72 bg-white border-r border-slate-200 h-screen sticky top-0 shrink-0">
@@ -87,7 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {schoolProfile.namaSekolah}
             </h2>
             <p className="text-xs text-indigo-600 font-semibold mt-0.5">
-              Sistem Buku Mutasi & Induk
+              Pengelolaan Sekolah Dasar
             </p>
           </div>
         </div>
@@ -114,25 +80,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   ? `Wali Kelas ${currentUser.assignedClass}`
                   : currentUser.role === 'kepala_sekolah'
                   ? 'Kepala Sekolah'
-                  : 'Tata Usaha / Admin'}
+                  : currentUser.role === 'admin'
+                  ? 'Administrator Sistem'
+                  : 'Tata Usaha'}
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Nav Links */}
+      {/* Main Nav Links (Dynamically rendered from Plug-and-Play Registry) */}
       <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-1.5">
         <div className="px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-          Menu Modul Sekolah
+          Menu Modul ({visibleModules.length})
         </div>
-        {mainNav.map((item) => {
-          const Icon = item.icon;
-          const isActive = currentTab === item.id;
+        {visibleModules.map((item) => {
+          const isActive =
+            currentTab === item.id ||
+            (typeof window !== 'undefined' &&
+              window.location.pathname.endsWith(item.path.split('?')[0]) &&
+              item.id !== 'dashboard');
+
           return (
             <button
               key={item.id}
-              onClick={() => onChangeTab(item.id)}
+              onClick={() => handleModuleClick(item)}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all ${
                 isActive
                   ? 'bg-indigo-600 text-white shadow-sm font-bold'
@@ -140,7 +112,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }`}
             >
               <div className="flex items-center gap-3">
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                <div className={isActive ? 'text-white' : 'text-slate-500'}>
+                  {renderModuleIcon(item.iconName, 'w-4 h-4')}
+                </div>
                 <span>{item.label}</span>
               </div>
               {item.badge && (
@@ -159,7 +133,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         })}
 
         <div className="pt-5 px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-          Pintasan & Manajemen
+          Pintasan Cepat
         </div>
         <button
           onClick={onOpenUserModal}
@@ -179,8 +153,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Footer Info */}
       <div className="p-4 border-t border-slate-200 bg-slate-50/50 text-[11px] text-slate-400 text-center">
-        <p className="font-semibold text-slate-600">SD Muhammadiyah 2 Bandung</p>
-        <p>Buku Mutasi & Induk Digital • Kemendikbud</p>
+        <p className="font-semibold text-slate-600"><a href="http://products.buana.studio/school">Primary School Management</a> <small>by <a href="http://buana.studio">Buana Studios</a></small></p>
+        <p>School Management • Sesuai Kemendikbud</p>
       </div>
     </aside>
   );

@@ -1,7 +1,7 @@
 /**
  * Generates clean student URL e.g. /siswa/2425010009
  * Dynamically handles root hosting (localhost:5173/siswa/2425010009)
- * as well as repository subpath hosting on GitHub Pages (e.g. /buana-school/siswa/2425010009)
+ * as well as repository subpath base routing (e.g. /buana-school/siswa/2425010009)
  */
 export const getStudentUrl = (nis: string): string => {
   if (typeof window === 'undefined') return `/siswa/${encodeURIComponent(nis)}`;
