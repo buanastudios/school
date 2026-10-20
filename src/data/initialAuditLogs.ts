@@ -75,7 +75,7 @@ export const initialAuditLogs: AuditLogEntry[] = [
     timestamp: '2026-10-16T10:05:12.000Z',
     action: 'SYSTEM_SETTINGS_UPDATE',
     actorId: 'user-admin',
-    actorName: 'Administrator Sistem (Buana Studios)',
+    actorName: 'Administrator Sistem',
     actorRole: 'admin',
     targetEntity: 'Profil Lembaga',
     details: 'Sinkronisasi profil lembaga SD Muhammadiyah 2 Bandung dan verifikasi NPSN 20219853.',

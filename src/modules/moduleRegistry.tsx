@@ -9,6 +9,7 @@ import {
   Printer,
   Users,
   ShieldCheck,
+  Shield,
   Blocks,
   Settings,
   HelpCircle,
@@ -139,6 +140,23 @@ export const defaultAppModules: AppModuleDefinition[] = [
     author: 'BUANA STUDIOS',
   },
   {
+    id: 'cobit5-governance',
+    code: 'MOD_COBIT5_GOV',
+    name: 'ISACA COBIT 5 Governance & Multi-Tenant Core',
+    label: 'Tata Kelola COBIT 5',
+    description: 'Framework kepatuhan DSS05 (Keamanan & Identitas), APO13 (Manajemen Keamanan & SoD), MEA01 (Resertifikasi Akses), dan arsitektur Multi-Tenant White-Label.',
+    iconName: 'Shield',
+    path: 'pengaturan.html?tab=governance',
+    category: 'Sistem & Keamanan',
+    allowedRoles: ['admin', 'kepala_sekolah'],
+    isEnabled: true,
+    order: 8,
+    badge: 'v2.0 COBIT',
+    version: '2.0.0',
+    isCore: true,
+    author: 'BUANA STUDIOS',
+  },
+  {
     id: 'audit-log',
     code: 'MOD_AUDIT_LOG',
     name: 'Log Audit Keamanan & Jejak Aktivitas',
@@ -149,7 +167,7 @@ export const defaultAppModules: AppModuleDefinition[] = [
     category: 'Sistem & Keamanan',
     allowedRoles: ['admin'], // Strictly admin only
     isEnabled: true,
-    order: 8,
+    order: 9,
     badge: 'Admin Only',
     version: '2.5.0',
     isCore: false,
@@ -166,7 +184,7 @@ export const defaultAppModules: AppModuleDefinition[] = [
     category: 'Sistem & Keamanan',
     allowedRoles: ['admin'], // Strictly admin only
     isEnabled: true,
-    order: 9,
+    order: 10,
     badge: 'Sistem',
     version: '2.5.0',
     isCore: true,
@@ -183,7 +201,7 @@ export const defaultAppModules: AppModuleDefinition[] = [
     category: 'Administrasi',
     allowedRoles: ['admin', 'kepala_sekolah', 'tata_usaha', 'wali_kelas'],
     isEnabled: true,
-    order: 10,
+    order: 11,
     version: '2.5.0',
     isCore: true,
     author: 'BUANA STUDIOS',
@@ -211,6 +229,8 @@ export const renderModuleIcon = (iconName: string, className = 'w-5 h-5'): React
       return <Users className={className} />;
     case 'ShieldCheck':
       return <ShieldCheck className={className} />;
+    case 'Shield':
+      return <Shield className={className} />;
     case 'Blocks':
       return <Blocks className={className} />;
     case 'Settings':

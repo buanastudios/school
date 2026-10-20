@@ -15,7 +15,9 @@ import {
   Monitor,
   Smartphone,
   Sparkles,
+  Building2,
 } from 'lucide-react';
+import { globalCoreGateway } from '../../core/governance';
 
 type AuthMode = 'signin' | 'signup' | 'forgot';
 type ViewMode = 'auto' | 'desktop' | 'mobile';
@@ -312,11 +314,16 @@ const MobileForgotIllustration: React.FC = () => (
 );
 
 export const AuthModule: React.FC = () => {
-  const { login, register, requestPasswordReset, verifyResetCode } = useApp();
+  const { login, register, verifyResetCode } = useApp();
 
   // Screen modes
   const [authMode, setAuthMode] = useState<AuthMode>('signin');
   const [viewMode, setViewMode] = useState<ViewMode>('auto');
+  const [selectedTenantId, setSelectedTenantId] = useState<string>('tenant-sd-muh-2');
+  const tenant =
+    globalCoreGateway.tenantEngine.getTenant(selectedTenantId) ||
+    globalCoreGateway.tenantEngine.getAllTenants()[0];
+
   const [isWindowMobile, setIsWindowMobile] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth < 768;
@@ -365,6 +372,16 @@ export const AuthModule: React.FC = () => {
     if (e) e.preventDefault();
     setFeedback(null);
 
+    // COBIT 5 Section 7.1: Tenant Deactivation Cascade
+    const tenantCheck = globalCoreGateway.tenantEngine.verifyTenantActive(selectedTenantId);
+    if (!tenantCheck.allowed) {
+      setFeedback({
+        type: 'error',
+        message: tenantCheck.message || 'Akses ditolak: Tenant saat ini berstatus SUSPENDED oleh tata kelola platform.',
+      });
+      return;
+    }
+
     const targetEmail = email.trim() || 'admin@buanastudios.com';
     const res = login(targetEmail, password);
 
@@ -382,6 +399,25 @@ export const AuthModule: React.FC = () => {
     if (e) e.preventDefault();
     setFeedback(null);
 
+    // COBIT 5 Section 7.1: Tenant Deactivation Cascade
+    const tenantCheck = globalCoreGateway.tenantEngine.verifyTenantActive(selectedTenantId);
+    if (!tenantCheck.allowed) {
+      setFeedback({
+        type: 'error',
+        message: tenantCheck.message || 'Pendaftaran ditolak: Tenant sedang ditangguhkan.',
+      });
+      return;
+    }
+
+    // COBIT 5 Section 3.1 A: Onboarding Strategy Enforcement
+    if (tenant.onboardingMode === 'ADMIN_INVITED_ONLY') {
+      setFeedback({
+        type: 'error',
+        message: `COBIT 5 DSS05.04: Kebijakan institusi [${tenant.name}] mewajibkan pendaftaran hanya melalui undangan Administrator resmi (ADMIN_INVITED_ONLY). Pendaftaran mandiri publik ditutup.`,
+      });
+      return;
+    }
+
     if (!fullName.trim()) {
       setFeedback({ type: 'error', message: 'Silakan isi Nama Lengkap Anda.' });
       return;
@@ -390,6 +426,19 @@ export const AuthModule: React.FC = () => {
       setFeedback({ type: 'error', message: 'Silakan masukkan alamat Email yang valid.' });
       return;
     }
+
+    // COBIT 5 Section 3.1 A: Password Policy Framework Validation
+    if (password) {
+      const pwdCheck = globalCoreGateway.identityEngine.validatePasswordStrength(password, tenant.passwordPolicy);
+      if (!pwdCheck.valid) {
+        setFeedback({
+          type: 'error',
+          message: `Kebijakan Sandi COBIT 5: ${pwdCheck.errors.join(' ')}`,
+        });
+        return;
+      }
+    }
+
     if (!agreeTerms) {
       setFeedback({
         type: 'error',
@@ -416,7 +465,7 @@ export const AuthModule: React.FC = () => {
     }
   };
 
-  const handleForgotSubmit = (e?: React.FormEvent) => {
+  const handleForgotSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setFeedback(null);
 
@@ -425,13 +474,19 @@ export const AuthModule: React.FC = () => {
       return;
     }
 
-    const res = requestPasswordReset(forgotQuery.trim());
-    if (res.success) {
-      setFeedback({ type: 'info', message: res.message });
-      setForgotStep(2);
-    } else {
-      setFeedback({ type: 'error', message: res.message });
-    }
+    // COBIT 5 Section 7.1: User Enumeration Denial (constant-time synthetic delay + 202 Accepted)
+    const res = await globalCoreGateway.dispatch({
+      path: '/api/v1/auth/forgot-password',
+      method: 'POST',
+      headers: { 'X-Tenant-ID': selectedTenantId },
+      body: { identifier: forgotQuery.trim() },
+    });
+
+    setFeedback({
+      type: 'info',
+      message: `${res.message} (HTTP ${res.status} Accepted - Delay ${res.latencyMs}ms)`,
+    });
+    setForgotStep(2);
   };
 
   const handleVerifyOtp = (e?: React.FormEvent) => {
@@ -465,12 +520,29 @@ export const AuthModule: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans antialiased">
       {/* Top Testing Bar (Allows testing Desktop/Tablet and Smartphone views on any device) */}
       <header className="bg-slate-900 text-white px-4 py-2 text-xs flex items-center justify-between z-50 border-b border-slate-800">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <div className="w-5 h-5 rounded bg-blue-600 flex items-center justify-center font-black text-[10px]">
             BS
           </div>
-          <span className="font-bold tracking-tight">Buana School Portal</span>
-          <span className="text-slate-400 hidden sm:inline">• Sistem Manajemen Sekolah Terpadu</span>
+          <span className="font-bold tracking-tight">{tenant.branding.institutionName}</span>
+          <span className="text-slate-400 hidden sm:inline">• v2.0 COBIT 5 Core</span>
+
+          {/* White-Label Tenant Context Dropdown */}
+          <div className="hidden md:flex items-center gap-1.5 bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-700 ml-2">
+            <Building2 className="w-3.5 h-3.5 text-blue-400" />
+            <select
+              value={selectedTenantId}
+              onChange={(e) => setSelectedTenantId(e.target.value)}
+              className="bg-transparent text-white text-[11px] font-bold outline-none cursor-pointer"
+              title="Ganti Tenant White-Label (PRD Section 2)"
+            >
+              {globalCoreGateway.tenantEngine.getAllTenants().map((t) => (
+                <option key={t.id} value={t.id} className="bg-slate-900 text-white">
+                  {t.name} ({t.status})
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* View Switcher */}
@@ -788,9 +860,9 @@ export const AuthModule: React.FC = () => {
                         value={role}
                         onChange={(e) => setRole(e.target.value as UserRole)}
                         className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                      >
-                        <option value="wali_kelas">Wali Kelas</option>
+                      >                        
                         <option value="kepala_sekolah">Kepala Sekolah</option>
+                        <option value="wali_kelas">Wali Kelas</option>
                         <option value="tata_usaha">Tata Usaha</option>
                       </select>
                     </div>

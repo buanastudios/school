@@ -9,6 +9,7 @@ import { SchoolSettingsModal } from '../components/settings/SchoolSettingsModal'
 import { AuditLogModule } from '../components/audit/AuditLogModule';
 import { ModuleManagementModule } from '../components/modules/ModuleManagementModule';
 import { UserManagementModule } from '../components/users/UserManagementModule';
+import { Cobit5GovernanceModule } from '../components/governance/Cobit5GovernanceModule';
 import {
   Users,
   Settings,
@@ -16,6 +17,7 @@ import {
   ArrowRight,
   School,
   ShieldCheck,
+  Shield,
   Blocks,
   Trophy,
   Sparkles,
@@ -24,7 +26,7 @@ import {
 } from 'lucide-react';
 import '../index.css';
 
-type SettingsTab = 'umum' | 'users' | 'modules' | 'audit';
+type SettingsTab = 'umum' | 'users' | 'modules' | 'audit' | 'governance';
 
 const PengaturanContent: React.FC = () => {
   const { schoolProfile, exportDataAsJson, importDataFromJson } = useApp();
@@ -33,8 +35,13 @@ const PengaturanContent: React.FC = () => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab');
-      if (tabParam === 'users' || tabParam === 'modules' || tabParam === 'audit') {
-        return tabParam;
+      if (
+        tabParam === 'users' ||
+        tabParam === 'modules' ||
+        tabParam === 'audit' ||
+        tabParam === 'governance'
+      ) {
+        return tabParam as SettingsTab;
       }
     }
     return 'umum';
@@ -67,6 +74,7 @@ const PengaturanContent: React.FC = () => {
     else if (tab === 'users') handleSelectTab('users');
     else if (tab === 'modules') handleSelectTab('modules');
     else if (tab === 'audit-log') handleSelectTab('audit');
+    else if (tab === 'cobit5-governance') handleSelectTab('governance');
     else if (tab === 'pengaturan') handleSelectTab('umum');
   };
 
@@ -176,6 +184,21 @@ const PengaturanContent: React.FC = () => {
                   Admin
                 </span>
               </button>
+
+              <button
+                onClick={() => handleSelectTab('governance')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                  activeTab === 'governance'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <Shield className="w-4 h-4 text-blue-500" />
+                <span>Tata Kelola COBIT 5</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 font-extrabold border border-blue-300">
+                  v2.0 Core
+                </span>
+              </button>
             </div>
 
             {/* TAB CONTENT 1: UMUM & SEKOLAH */}
@@ -259,6 +282,31 @@ const PengaturanContent: React.FC = () => {
                       </div>
                       <ArrowRight className="w-4 h-4 text-slate-400" />
                     </button>
+
+                    <button
+                      onClick={() => handleSelectTab('governance')}
+                      className="w-full flex items-center justify-between p-3.5 rounded-xl border border-blue-200 bg-blue-50/30 hover:border-blue-400 hover:bg-blue-50/70 transition-all text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                          <Shield className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs font-bold text-slate-900">
+                              Tata Kelola COBIT 5 & Multi-Tenant White-Label Core (v2.0)
+                            </p>
+                            <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 border border-blue-300">
+                              Core Engine
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500">
+                            ISACA COBIT 5 (DSS05, APO13, MEA01), Segregation of Duties (SoD), Session Kill-Switch, dan WORM SIEM
+                          </p>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-blue-500" />
+                    </button>
                   </div>
                 </div>
 
@@ -331,6 +379,11 @@ const PengaturanContent: React.FC = () => {
             {/* TAB CONTENT 4: LOG AUDIT KEAMANAN */}
             {activeTab === 'audit' && (
               <AuditLogModule onBackToSettings={() => handleSelectTab('umum')} />
+            )}
+
+            {/* TAB CONTENT 5: TATA KELOLA COBIT 5 & MULTI-TENANT CORE */}
+            {activeTab === 'governance' && (
+              <Cobit5GovernanceModule />
             )}
           </div>
         </main>

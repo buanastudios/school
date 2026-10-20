@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Users,
   LogIn,
+  Shield,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { renderModuleIcon } from '../../modules/moduleRegistry';
@@ -150,6 +151,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <Database className="w-4 h-4 text-slate-500" />
           <span>Identitas & Cadangan JSON</span>
         </button>
+        <a
+          href="pengaturan.html?tab=governance"
+          className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl font-bold text-xs text-blue-700 bg-blue-50/70 hover:bg-blue-100 transition-colors border border-blue-200"
+        >
+          <div className="flex items-center gap-3">
+            <Shield className="w-4 h-4 text-blue-600" />
+            <span>Tata Kelola COBIT 5</span>
+          </div>
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white font-extrabold">
+            v2.0
+          </span>
+        </a>
         <a
           href="login.html"
           className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl font-medium text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"

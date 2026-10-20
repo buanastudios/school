@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { School, UserCheck, ChevronDown, Printer, LogOut, LogIn } from 'lucide-react';
+import { School, UserCheck, ChevronDown, Printer, LogOut, LogIn, Shield } from 'lucide-react';
 import type { User } from '../../types';
 
 interface HeaderProps {
@@ -48,6 +48,14 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
                 NPSN {schoolProfile.npsn}
               </span>
+              <a
+                href="pengaturan.html?tab=governance"
+                className="hidden md:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition-colors"
+                title="ISACA COBIT 5 Governance Core v2.0 (DSS05, APO13, MEA01)"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>v2.0 COBIT 5 Core</span>
+              </a>
             </div>
             <p className="text-[11px] text-slate-500 truncate flex items-center gap-1">
               <span>{schoolProfile.kecamatan}, {schoolProfile.kabupatenKota}</span>
@@ -161,6 +169,13 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
 
                   <div className="pt-2 px-3 border-t border-slate-100 space-y-1">
+                    <a
+                      href="pengaturan.html?tab=governance"
+                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-semibold text-blue-700 hover:bg-blue-50 transition-colors"
+                    >
+                      <Shield className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Tata Kelola COBIT 5 (v2.0)</span>
+                    </a>
                     <a
                       href="login.html"
                       className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors"
