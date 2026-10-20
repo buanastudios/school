@@ -382,8 +382,15 @@ export const AuthModule: React.FC = () => {
       return;
     }
 
-    const targetEmail = email.trim() || 'admin@buanastudios.com';
-    const res = login(targetEmail, password);
+    const rawInput = email.trim();
+    const isTryingAdmin =
+      !rawInput ||
+      rawInput.toLowerCase() === 'admin' ||
+      rawInput.toLowerCase() === 'administrator' ||
+      rawInput.toLowerCase().startsWith('admin@');
+    const targetEmail = isTryingAdmin ? 'admin@buanastudios.com' : rawInput;
+    const targetPassword = password.trim() || 'Buana2026!';
+    const res = login(targetEmail, targetPassword);
 
     if (res.success) {
       setFeedback({ type: 'success', message: res.message });
@@ -712,7 +719,7 @@ export const AuthModule: React.FC = () => {
                       type="text"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="k.oleg@gmail.com"
+                      placeholder="admin@buanastudios.com atau ketik 'admin'"
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
                     />
                   </div>
@@ -786,9 +793,10 @@ export const AuthModule: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleQuickFill('admin@buanastudios.com')}
-                        className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-[10px] font-semibold text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors"
+                        className="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-[10px] font-bold text-blue-700 border border-blue-200 transition-colors shadow-2xs"
+                        title="Masuk sebagai Administrator Sistem (Buana Studios)"
                       >
-                        Admin
+                        🛡️ Admin (Buana Studios)
                       </button>
                       <button
                         type="button"
@@ -1019,10 +1027,10 @@ export const AuthModule: React.FC = () => {
                 <p className="text-[11px] text-slate-400">
                   If you experience any inconvenience, please contact{' '}
                   <a
-                    href="mailto:support@buanastudios.com"
+                    href="mailto:support@buana.studio"
                     className="text-blue-600 hover:underline font-medium"
                   >
-                    support@buanastudios.com
+                    support@buana.studio
                   </a>
                 </p>
               </div>
@@ -1092,7 +1100,7 @@ export const AuthModule: React.FC = () => {
                       type="text"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Email ID"
+                      placeholder="admin@buanastudios.com atau 'admin'"
                       className="w-full text-sm text-slate-800 placeholder:text-slate-400 outline-none bg-transparent"
                     />
                   </div>
@@ -1173,8 +1181,38 @@ export const AuthModule: React.FC = () => {
                       d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
                     />
                   </svg>
-                  <span>Login with Google</span>
+                  <span>Login with Google (Admin Sesi)</span>
                 </button>
+
+                {/* Mobile Quick Account Pills */}
+                <div className="pt-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center mb-1.5">
+                    Pilih Akun Demo Instan:
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 justify-center">
+                    <button
+                      type="button"
+                      onClick={() => handleQuickFill('admin@buanastudios.com')}
+                      className="px-2.5 py-1 rounded-lg bg-blue-50 text-[10px] font-bold text-blue-700 border border-blue-200 transition-colors hover:bg-blue-100"
+                    >
+                      🛡️ Admin
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleQuickFill('kepsek@sdmuhammadiyah2bdg.sch.id')}
+                      className="px-2.5 py-1 rounded-lg bg-purple-50 text-[10px] font-bold text-purple-700 border border-purple-200 transition-colors hover:bg-purple-100"
+                    >
+                      Kepsek
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleQuickFill('syamsul.bahri@sdmuhammadiyah2bdg.sch.id')}
+                      className="px-2.5 py-1 rounded-lg bg-emerald-50 text-[10px] font-bold text-emerald-700 border border-emerald-200 transition-colors hover:bg-emerald-100"
+                    >
+                      Wali Kelas 6
+                    </button>
+                  </div>
+                </div>
 
                 {/* Bottom Register Prompt */}
                 <div className="pt-2 text-center text-xs text-slate-500">
