@@ -1,0 +1,427 @@
+export type UserRole = 'wali_kelas' | 'kepala_sekolah' | 'tata_usaha' | 'admin';
+
+export interface User {
+  id: string;
+  name: string;
+  role: UserRole;
+  assignedClass?: number; // 1-6 for homeroom teachers
+  nip?: string;
+  nuptk?: string;
+  signatureUrl?: string; // Data URL or SVG string
+  email?: string;
+  phone?: string;
+  status?: 'active' | 'inactive';
+  lastLogin?: string;
+}
+
+export interface SchoolProfile {
+  namaSekolah: string;
+  npsn: string;
+  nss: string;
+  kodeSekolah: string;
+  alamatSekolah: string;
+  desaKelurahan: string;
+  kecamatan: string;
+  kabupatenKota: string;
+  provinsi: string;
+  kodePos: string;
+  tahunPelajaran: string; // e.g. "2023 - 2024" or "2024 - 2025"
+  kepalaSekolahNama: string;
+  kepalaSekolahNip: string;
+  kepalaSekolahTtd?: string;
+  logoUrl?: string;
+}
+
+export type Gender = 'L' | 'P';
+
+export type MutationType = 'masuk' | 'keluar';
+
+export interface StudentMutation {
+  id: string;
+  type: MutationType;
+  noUrut: number;
+  tanggal: string; // YYYY-MM-DD
+  namaSiswa: string;
+  jenisKelamin: Gender;
+  noInduk: string; // NIS
+  nisn: string; // NISN
+  kelas: number; // 1 to 6
+
+  // Specific to Mutasi Keluar
+  noSuratPindah?: string;
+  keteranganPindah?: string; // Pindah ke mana & alasan
+
+  // Specific to Mutasi Masuk
+  asalSekolah?: string;
+  noIndukAsal?: string;
+  kelasAsal?: string;
+  persetujuanKanwilTgl?: string;
+  persetujuanKanwilNomor?: string;
+
+  // Metadata
+  bulan: number; // 1-12
+  tahun: number;
+  tahunPelajaran: string;
+  createdById?: string;
+  createdAt: string;
+}
+
+export interface PhysicalHealthRecord {
+  tahunPelajaran: string;
+  tinggiBadanGanjil?: number;
+  tinggiBadanGenap?: number;
+  beratBadanGanjil?: number;
+  beratBadanGenap?: number;
+  pendengaran?: string;
+  penglihatan?: string;
+  gigi?: string;
+  lainnya?: string;
+}
+
+export interface SubjectGrade {
+  mapelId: string;
+  mapelNama: string;
+  kategori: 'Agama' | 'Umum' | 'Muatan Lokal' | 'Kelompok A' | 'Kelompok B';
+  kelompok?: 'Kelompok A' | 'Kelompok B';
+  nilaiGanjil?: number;
+  capaianGanjil?: string;
+  capaianTinggiGanjil?: string;
+  capaianPerluPeningkatanGanjil?: string;
+  kktpGanjil?: number;
+  nilaiGenap?: number;
+  capaianGenap?: string;
+  capaianTinggiGenap?: string;
+  capaianPerluPeningkatanGenap?: string;
+  kktpGenap?: number;
+}
+
+export type ActivityCategory =
+  | 'Teknologi'
+  | 'Bela Diri'
+  | 'Seni & Desain'
+  | 'Kuliner & Keterampilan'
+  | 'Olahraga'
+  | 'Bahasa & Keagamaan'
+  | 'Petualangan & Alam Bebas';
+
+export interface ExtracurricularMaster {
+  id: string;
+  nama: string; // e.g. "Robotic", "Jiujitsu (Grappling)", "Drawing", "Cooking", "Futsal", "Pencak Silat"
+  kategori: ActivityCategory;
+  deskripsi: string;
+  pembina: string;
+  jadwal: string;
+  lokasi?: string;
+  tingkatKelas: number[]; // e.g. [1, 2, 3, 4, 5, 6]
+  kuotaMaksimal?: number;
+  status: 'aktif' | 'nonaktif';
+  isWajibPemerintah?: boolean; // e.g. Pencak Silat requested by government
+  iconName?: string;
+}
+
+export type SkillMasteryLevel =
+  | 'Belum Diuji'
+  | 'Tingkat Pemula'
+  | 'Tingkat Berkembang'
+  | 'Tingkat Terampil'
+  | 'Lulus Uji Mandiri / Mahir';
+
+export interface MustHaveSkillMaster {
+  id: string;
+  kode: 'swimming' | 'horse_riding' | 'camping_skill' | 'rope_rappelling' | string;
+  nama: string; // "Berenang (Swimming)", "Berkuda (Horse Riding)", "Pramuka & Kemampuan Berkemah (Camping Skill)", "Rappelling & Tali Temali (Rope Rappelling)"
+  kategori: 'Outdoor Adventure' | 'Sunnah Sport' | 'Survival & Kepanduan';
+  deskripsi: string;
+  wajibSemuaSiswa: boolean; // Must have skill in this school
+  kompetensiDasar: string[];
+  tingkatUji: string[];
+  instruktur: string;
+  jadwalLatihan: string;
+  lokasi: string;
+  iconName: string;
+  status: 'aktif' | 'nonaktif';
+}
+
+export interface StudentMustHaveSkillRecord {
+  skillId: string;
+  kode: string;
+  nama: string;
+  levelCapaian: SkillMasteryLevel;
+  badgeEarned: boolean;
+  tanggalUjian?: string;
+  penguji?: string;
+  catatan?: string;
+  pencapaianSpesifik?: string[];
+}
+
+export interface Extracurricular {
+  nama: string; // e.g. Robotic, Jiujitsu (Grappling), Drawing, Cooking, Futsal, Silat
+  nilaiGanjil?: string; // Sangat Baik, Baik, etc.
+  keteranganGanjil?: string;
+  nilaiGenap?: string;
+  keteranganGenap?: string;
+  pembina?: string;
+  jadwal?: string;
+}
+
+export interface AttendanceRecord {
+  sakitSem1: number;
+  izinSem1: number;
+  alpaSem1: number;
+  sakitSem2: number;
+  izinSem2: number;
+  alpaSem2: number;
+}
+
+export interface HistoricalSemesterScore {
+  semesterLabel: string; // e.g. "Kelas 1 Sem 1", "Kelas 1 Sem 2"
+  tahunPelajaran: string;
+  nilaiRataRata: number;
+  kehadiranPersen: number;
+  scores: { [mapelNama: string]: number };
+}
+
+export interface CocurricularProject {
+  id: string;
+  tema: string; // e.g. "Kearifan Lokal", "Gaya Hidup Berkelanjutan", "Kewirausahaan"
+  judulProjek: string;
+  deskripsi: string;
+  dimensi: string[]; // e.g. ["Beriman & Bertakwa", "Gotong Royong", "Kreatif"]
+  capaian: 'Mulai Berkembang' | 'Sedang Berkembang' | 'Berkembang Sesuai Harapan' | 'Sangat Berkembang';
+  keterangan: string;
+}
+
+export interface StudentContribution {
+  id: string;
+  tanggal: string;
+  jenis: 'Prestasi Lomba' | 'Karya / Inovasi' | 'Kepemimpinan' | 'Sosial & Keagamaan' | 'Kontribusi Sekolah';
+  judul: string;
+  tingkat?: 'Sekolah' | 'Kecamatan' | 'Kota' | 'Provinsi' | 'Nasional';
+  penghargaan?: string; // e.g. "Juara 1 Lomba Kaligrafi Pentas PAI", "Ketua Regu HW", "Duta Adiwiyata"
+  deskripsi: string;
+  fotoUrl?: string;
+}
+
+export interface StudentMasterRecord {
+  id: string;
+  noUrutBukuInduk: number;
+  noInduk: string; // NIS
+  nisn: string;
+  nik: string;
+  noKk: string;
+  kelas: number;
+  tahunPelajaran: string;
+  tahunMasuk: number;
+  tahunKeluarLulus?: number;
+  statusSiswa: 'Aktif' | 'Mutasi Masuk' | 'Mutasi Keluar' | 'Lulus';
+  pasFotoUrl?: string;
+
+  // A. Keterangan Pribadi
+  namaLengkap: string;
+  namaPanggilan: string;
+  jenisKelamin: Gender;
+  tempatLahir: string;
+  tanggalLahir: string; // YYYY-MM-DD
+  agama: string;
+  kewarganegaraan: string;
+  anakKe: number;
+  jumlahSaudaraKandung: number;
+  jumlahSaudaraSambung: number;
+  bahasaSehariHari: string;
+  golonganDarah: string;
+  alamatTinggal: {
+    jalan: string;
+    rtRw: string;
+    desaKelurahan: string;
+    kecamatan: string;
+    kabupatenKota: string;
+    provinsi: string;
+    kodePos: string;
+    noTelepon?: string;
+  };
+  bertempatTinggalPada: string; // 'Orang Tua' | 'Menumpang' | 'Asrama' | etc
+  jarakKeSekolahKm?: string;
+
+  // B. Keterangan Orang Tua / Wali
+  orangTua: {
+    namaAyah: string;
+    namaIbu: string;
+    pendidikanAyah: string;
+    pendidikanIbu: string;
+    pekerjaanAyah: string;
+    pekerjaanIbu: string;
+    namaWali?: string;
+    hubunganWali?: string;
+    pendidikanWali?: string;
+    pekerjaanWali?: string;
+  };
+
+  // C. Perkembangan
+  pendidikanSebelumnya: {
+    jenisMasuk: 'Siswa Baru' | 'Pindahan';
+    asalSekolah?: string;
+    tanggalSttb?: string;
+    noSttb?: string;
+    dariTingkat?: string;
+    diterimaTanggal?: string;
+    noSuratKeterangan?: string;
+  };
+
+  // D. Beasiswa
+  beasiswa?: string;
+
+  // E. Meninggalkan Sekolah
+  meninggalkanSekolah?: {
+    alasan?: 'Lulus' | 'Pindah' | 'Keluar';
+    tahunLulus?: string;
+    noIjazah?: string;
+    melanjutkanKe?: string;
+    pindahKeSekolah?: string;
+    pindahTingkat?: string;
+    alasanKeluar?: string;
+    tanggalKeluar?: string;
+  };
+
+  // F. Fisik & Kesehatan
+  catatanKesehatan: PhysicalHealthRecord[];
+
+  // Capaian Pembelajaran Kurikulum Merdeka (Rapor Lembar IV)
+  grades: SubjectGrade[];
+  extracurriculars: Extracurricular[];
+  attendance: AttendanceRecord;
+  kenaikanKelas?: {
+    status: 'Naik' | 'Tinggal' | 'Belum Ditetapkan';
+    keKelas?: number;
+    tanggalKetetapan?: string;
+    waliKelasNama?: string;
+    waliKelasNip?: string;
+  };
+
+  // Live Comprehensive Student Profile & School Hall Public Record
+  historicalScores: HistoricalSemesterScore[];
+  cocurriculars: CocurricularProject[];
+  contributions: StudentContribution[];
+  mustHaveSkills?: StudentMustHaveSkillRecord[];
+
+  // Kurikulum Merdeka Official Rapor Fields
+  fase?: string; // e.g. 'A' | 'B' | 'C'
+  statusDalamKeluarga?: string; // e.g. 'Anak Kandung'
+  nomorTeleponRumah?: string;
+  catatanWaliKelasSem1?: string;
+  catatanWaliKelasSem2?: string;
+  kokurikulerSem1?: string;
+  kokurikulerSem2?: string;
+  ekskulSem1?: { nama: string; predikat?: string; keterangan: string }[];
+  ekskulSem2?: { nama: string; predikat?: string; keterangan: string }[];
+  tglRaporSem1?: string;
+  tglRaporSem2?: string;
+  waliKelasNama?: string;
+  waliKelasNuptk?: string;
+  waliKelasNip?: string;
+  waliKelasTtd?: string;
+  kepalaSekolahNama?: string;
+  kepalaSekolahNip?: string;
+  kepalaSekolahTtd?: string;
+  kelulusanStatus?: string; // e.g. 'Lulus' | 'Naik ke Kelas 2'
+}
+
+export interface MonthlyClassRekap {
+  kelas: number;
+  awalL: number;
+  awalP: number;
+  awalTotal: number;
+  masukL: number;
+  masukP: number;
+  masukTotal: number;
+  keluarL: number;
+  keluarP: number;
+  keluarTotal: number;
+  akhirL: number;
+  akhirP: number;
+  akhirTotal: number;
+  keterangan?: string;
+}
+
+export interface MonthlyRekapitulasi {
+  bulan: number; // 1-12 (Juli=7 ... Juni=6)
+  tahun: number;
+  tahunPelajaran: string;
+  items: MonthlyClassRekap[];
+  totalAwalL: number;
+  totalAwalP: number;
+  totalAwal: number;
+  totalMasukL: number;
+  totalMasukP: number;
+  totalMasuk: number;
+  totalKeluarL: number;
+  totalKeluarP: number;
+  totalKeluar: number;
+  totalAkhirL: number;
+  totalAkhirP: number;
+  totalAkhir: number;
+}
+
+// ==========================================
+// AUDIT LOG & ENTERPRISE SECURITY
+// ==========================================
+export type AuditActionType =
+  | 'AUTH_LOGIN'
+  | 'AUTH_LOGOUT'
+  | 'AUTH_REGISTER'
+  | 'AUTH_PASSWORD_RESET'
+  | 'AUTH_SWITCH_USER'
+  | 'USER_CREATE'
+  | 'USER_UPDATE'
+  | 'USER_DELETE'
+  | 'STUDENT_CREATE'
+  | 'STUDENT_UPDATE'
+  | 'STUDENT_DELETE'
+  | 'GRADE_UPDATE'
+  | 'RAPOR_GENERATE'
+  | 'RAPOR_PRINT'
+  | 'MUTATION_CREATE'
+  | 'MUTATION_UPDATE'
+  | 'MUTATION_DELETE'
+  | 'ACTIVITY_UPDATE'
+  | 'MODULE_CONFIG_UPDATE'
+  | 'MENU_CONFIG_UPDATE'
+  | 'SYSTEM_SETTINGS_UPDATE'
+  | 'DATA_EXPORT'
+  | 'DATA_IMPORT'
+  | 'SECURITY_ALERT';
+
+export interface AuditLogEntry {
+  id: string;
+  timestamp: string; // ISO 8601
+  action: AuditActionType;
+  actorId: string;
+  actorName: string;
+  actorRole: UserRole;
+  targetEntity: string;
+  details: string;
+  status: 'SUCCESS' | 'WARNING' | 'FAILED';
+  ipAddress?: string;
+  userAgent?: string;
+}
+
+// ==========================================
+// DYNAMIC MODULE & MENU MANAGEMENT (PLUG-AND-PLAY)
+// ==========================================
+export interface AppModuleDefinition {
+  id: string; // e.g. 'dashboard', 'mutasi', 'buku-induk', 'rapor', 'kegiatan', 'cetak-buku', 'users', 'audit-log', 'modules', 'pengaturan'
+  code: string;
+  name: string;
+  label: string;
+  description: string;
+  iconName: string; // Lucide icon identifier
+  path: string; // Target page route (e.g. 'index.html', 'rapor.html')
+  category: 'Utama' | 'Kesiswaan' | 'Akademik' | 'Administrasi' | 'Sistem & Keamanan';
+  allowedRoles: UserRole[];
+  isEnabled: boolean;
+  order: number;
+  badge?: string;
+  version: string;
+  isCore?: boolean; // Cannot be disabled if core
+  author?: string;
+}
+

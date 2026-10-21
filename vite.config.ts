@@ -43,6 +43,7 @@ export default defineConfig({
         rapor: resolve(import.meta.dirname, 'rapor.html'),
         siswa: resolve(import.meta.dirname, 'siswa.html'),
         pengaturan: resolve(import.meta.dirname, 'pengaturan.html'),
+        universalV3: resolve(import.meta.dirname, 'universal-v3.html'),
       },
     },
   },

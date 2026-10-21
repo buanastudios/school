@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { School, UserCheck, ChevronDown, Printer, LogOut, LogIn, Shield } from 'lucide-react';
+import { School, UserCheck, ChevronDown, Printer, LogOut, LogIn, Shield, Sparkles } from 'lucide-react';
 import type { User } from '../../types';
 
 interface HeaderProps {
@@ -55,6 +55,14 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span>v2.0 COBIT 5 Core</span>
+              </a>
+              <a
+                href="universal-v3.html"
+                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs hover:from-blue-700 hover:to-indigo-700 transition-all scale-[1.02]"
+                title="Universal School Management Enterprise Suite v3.0 (6 Core Pillars)"
+              >
+                <Sparkles className="w-3 h-3 text-amber-300" />
+                <span>v3.0 Universal Suite</span>
               </a>
             </div>
             <p className="text-[11px] text-slate-500 truncate flex items-center gap-1">

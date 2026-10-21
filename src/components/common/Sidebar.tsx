@@ -32,10 +32,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
     .sort((a, b) => a.order - b.order);
 
   const handleModuleClick = (m: (typeof visibleModules)[0]) => {
-    // If target has path containing .html and current page is not that, navigate
-    if (m.path.includes('?')) {
-      window.location.href = m.path;
-    } else if (m.id === 'dashboard') {
+    // If target has path pointing to another page, navigate directly
+    if (m.path.includes('.html')) {
+      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      if (!m.path.startsWith(currentPage)) {
+        window.location.href = m.path;
+        return;
+      }
+    }
+    if (m.id === 'dashboard') {
       onChangeTab('dashboard');
     } else {
       onChangeTab(m.id as NavTab);

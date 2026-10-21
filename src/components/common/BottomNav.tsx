@@ -12,7 +12,8 @@ export type NavTab =
   | 'users'
   | 'audit-log'
   | 'modules'
-  | 'pengaturan';
+  | 'pengaturan'
+  | 'universal-v3';
 
 interface BottomNavProps {
   currentTab: NavTab;

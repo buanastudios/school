@@ -13,6 +13,7 @@ import {
   Blocks,
   Settings,
   HelpCircle,
+  Sparkles,
 } from 'lucide-react';
 
 /**
@@ -140,6 +141,23 @@ export const defaultAppModules: AppModuleDefinition[] = [
     author: 'BUANA STUDIOS',
   },
   {
+    id: 'universal-v3',
+    code: 'MOD_UNIVERSAL_V3',
+    name: 'Universal School Suite v3 (6 Pillars)',
+    label: 'v3 Universal Suite',
+    description: 'Suite pendidikan universal: SIS Lifecycle, Timetable Conflict Engine, Multi-Skala Rapor, Keuangan & Payroll, Komunikasi Omnichannel, dan PPDB CRM.',
+    iconName: 'Sparkles',
+    path: 'universal-v3.html',
+    category: 'Utama',
+    allowedRoles: ['admin', 'kepala_sekolah', 'wali_kelas', 'tata_usaha'],
+    isEnabled: true,
+    order: 8,
+    badge: 'v3.0 PRD',
+    version: '3.0.0',
+    isCore: true,
+    author: 'BUANA STUDIOS',
+  },
+  {
     id: 'cobit5-governance',
     code: 'MOD_COBIT5_GOV',
     name: 'ISACA COBIT 5 Governance & Multi-Tenant Core',
@@ -235,6 +253,8 @@ export const renderModuleIcon = (iconName: string, className = 'w-5 h-5'): React
       return <Blocks className={className} />;
     case 'Settings':
       return <Settings className={className} />;
+    case 'Sparkles':
+      return <Sparkles className={className} />;
     default:
       return <HelpCircle className={className} />;
   }
