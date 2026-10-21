@@ -620,7 +620,7 @@ export const AuthModule: React.FC = () => {
               </div>
               <div>
                 <span className="text-xl font-extrabold tracking-tight text-slate-900">
-                  Buana<span className="text-blue-600">School</span>
+                  A&nbsp;<span className="text-blue-600">School Management</span>
                 </span>
                 <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
                   by BUANA STUDIOS
@@ -639,7 +639,7 @@ export const AuthModule: React.FC = () => {
                 Solusi Manajemen Sekolah Terpadu dalam Satu Sentuhan.
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
-                Akses portal resmi guru wali kelas, staf tata usaha, dan pimpinan untuk tata kelola rapor Kurikulum Merdeka, buku mutasi 12 bulan, dan buku induk murid.
+                Portal resmi bagi guru, wali kelas, tata usaha, dan pimpinan dalam mengelola sekolah dasar.
               </p>
             </div>
           </div>
